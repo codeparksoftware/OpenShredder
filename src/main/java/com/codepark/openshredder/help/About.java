@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import java.awt.Font;
 
 /**
  * @author root
@@ -35,7 +36,7 @@ public class About extends JFrame {
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon(About.class.getResource("../images/flat-paper-shredder-icon.png")));
+		lblNewLabel.setIcon(new ImageIcon(About.class.getResource("/com/codepark/openshredder/images/main_icon.png")));
 		getContentPane().add(lblNewLabel, BorderLayout.WEST);
 
 		JPanel panel = new JPanel();
@@ -65,13 +66,13 @@ public class About extends JFrame {
 		JLabel label_3 = new JLabel("Company");
 		label_3.setBounds(12, 72, 113, 15);
 
-		JLabel label_4 = new JLabel("Imece Software");
-		label_4.setBounds(125, 72, 159, 15);
-		label_4.setHorizontalAlignment(SwingConstants.LEFT);
+		JLabel lblTulipSoftware = new JLabel("CodePark");
+		lblTulipSoftware.setBounds(125, 72, 159, 15);
+		lblTulipSoftware.setHorizontalAlignment(SwingConstants.LEFT);
 
-		JLabel label_5 = new JLabel("GPL v2");
-		label_5.setBounds(125, 32, 159, 15);
-		label_5.setHorizontalAlignment(SwingConstants.LEFT);
+		JLabel lblV = new JLabel("v 0.0.1");
+		lblV.setBounds(125, 32, 159, 15);
+		lblV.setHorizontalAlignment(SwingConstants.LEFT);
 
 		JLabel label_10 = new JLabel("");
 		label_10.setBounds(240, 32, 0, 0);
@@ -79,9 +80,9 @@ public class About extends JFrame {
 		JLabel label_11 = new JLabel("");
 		label_11.setBounds(245, 32, 0, 0);
 
-		JLabel label_6 = new JLabel("v 0.0.1");
-		label_6.setBounds(125, 52, 159, 15);
-		label_6.setHorizontalAlignment(SwingConstants.LEFT);
+		JLabel lblGplV = new JLabel("GPL v2");
+		lblGplV.setBounds(125, 52, 159, 15);
+		lblGplV.setHorizontalAlignment(SwingConstants.LEFT);
 
 		JLabel label_7 = new JLabel("Open Shredder");
 		label_7.setBounds(125, 12, 159, 15);
@@ -111,11 +112,11 @@ public class About extends JFrame {
 		panel_1.add(label_2);
 		panel_1.add(label_9);
 		panel_1.add(label_3);
-		panel_1.add(label_4);
-		panel_1.add(label_5);
+		panel_1.add(lblTulipSoftware);
+		panel_1.add(lblV);
 		panel_1.add(label_10);
 		panel_1.add(label_11);
-		panel_1.add(label_6);
+		panel_1.add(lblGplV);
 		panel_1.add(label_7);
 		panel_1.add(label_12);
 		panel_1.add(label_15);
@@ -125,10 +126,11 @@ public class About extends JFrame {
 		panel_1.add(label_14);
 
 		JTextArea txtrOpenShredderIs = new JTextArea();
+		txtrOpenShredderIs.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 11));
 		txtrOpenShredderIs.setWrapStyleWord(true);
 		txtrOpenShredderIs.setBackground(UIManager.getColor("Button.background"));
 		txtrOpenShredderIs.setText(
-				"Open Shredder is secure file deletion tool. It uses one pass ZERO  and three pass DoD standard algorithms. Before using it,be careful. You can not recover your files after deletion.\nIt is free  personal using.\nPlease let us know your feedback.\nHope enjoys.\nThanks for using.\nImece Software ");
+				"Open Shredder is secure file deletion tool. It uses one pass ZERO  and three pass DoD standard algorithms. Before using this program,please be careful. You can not recover your files after deletion.\r\nIt is free  for personal use.\r\nPlease let us know your feedback.\r\nHope enjoys.\r\nThanks for using.\r\nCodePark");
 		txtrOpenShredderIs.setEditable(false);
 		txtrOpenShredderIs.setLineWrap(true);
 		txtrOpenShredderIs.setBounds(12, 94, 402, 173);

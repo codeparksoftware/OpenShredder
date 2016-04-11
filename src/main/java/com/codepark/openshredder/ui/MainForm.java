@@ -20,8 +20,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DropMode;
@@ -47,6 +49,11 @@ import javax.swing.table.TableCellRenderer;
 
 import com.codepark.openshredder.base.WipeMethod;
 import com.codepark.openshredder.help.About;
+import com.codepark.openshredder.help.AboutUs;
+
+import javax.swing.JPopupMenu;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainForm extends JFrame {
 
@@ -54,17 +61,36 @@ public class MainForm extends JFrame {
 	private WipeMethod metod = WipeMethod.DoD;
 	private JButton btnDosyaEkle, btnKlasorEkle, btnRemoveFile, btnRemoveAll, btnStart, btnPart, btnDisk;
 	private JTable table;
+	private Properties prop;
 	public static final String[] columnNames = { "Icon", "File", "Size", "Type", "Last Modified Time",
 			"Last Accessed Time", "Created Time" };
 
 	public MainForm() {
-		
-		setIconImage(Toolkit.getDefaultToolkit().getImage(MainForm.class.getResource("/com/codepark/openshredder/images/clear.png")));
-		setTitle("File Shredder");
+
+		setIconImage(Toolkit.getDefaultToolkit()
+				.getImage(MainForm.class.getResource("/com/codepark/openshredder/images/main_icon.png")));
+		setTitle("Open Shredder");
 		this.setSize(104, 768);
 		initializeMenu();
 		setContentUI();
 		pack();
+
+		// TheVersionClass();
+	}
+
+	public void TheVersionClass() {
+		InputStream resourceAsStream = this.getClass()
+				.getResourceAsStream("/META-INF/maven/com.soebes.examples/version-examples-i/pom.properties");
+		this.prop = new Properties();
+
+		try {
+			this.prop.load(resourceAsStream);
+			while (this.prop.keys().hasMoreElements())
+				System.out.println(this.prop.keys().nextElement().toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -143,6 +169,58 @@ public class MainForm extends JFrame {
 		});
 
 		JScrollPane js = new JScrollPane(table);
+
+		JPopupMenu popupMenu = new JPopupMenu();
+		addPopup(table, popupMenu);
+
+		JMenuItem itmAddFile = new JMenuItem("Add File");
+		itmAddFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addFile();
+			}
+		});
+		popupMenu.add(itmAddFile);
+
+		JMenuItem itmNewMenuItem = new JMenuItem("Add Folder");
+		itmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addDirectory();
+			}
+		});
+		popupMenu.add(itmNewMenuItem);
+		popupMenu.addSeparator();
+		JMenuItem itmRemoveSelected = new JMenuItem("Remove Selected");
+		itmRemoveSelected.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				removeSelected();
+
+			}
+		});
+		popupMenu.add(itmRemoveSelected);
+
+		JMenuItem itmRemoveAll = new JMenuItem("Remove All");
+		itmRemoveAll.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clearList();
+			}
+		});
+		popupMenu.add(itmRemoveAll);
+		table.addMouseListener(new MouseAdapter() {
+
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					JTable source = (JTable) e.getSource();
+					int row = source.rowAtPoint(e.getPoint());
+					int column = source.columnAtPoint(e.getPoint());
+					if (!source.isRowSelected(row))
+						source.changeSelection(row, column, false, false);
+					popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 		panel_2.add(js);
 
 	}
@@ -168,7 +246,6 @@ public class MainForm extends JFrame {
 		mnitmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(0);
-				// JOptionPane.showMessageDialog(null, table.getRowCount());
 			}
 		});
 
@@ -209,15 +286,81 @@ public class MainForm extends JFrame {
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 
-		JMenuItem mntmNewMenuItem = new JMenuItem("About");
-		mnHelp.add(mntmNewMenuItem);
-		mntmNewMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				About ab = new About();
-//				ab.setDefaultCloseOperation(JFrame.);
+		JMenuItem itmAboutUs = new JMenuItem("About Us");
+		itmAboutUs.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AboutUs ab = new AboutUs();
 				ab.setVisible(true);
 			}
 		});
+		mnHelp.add(itmAboutUs);
+
+		JMenuItem itmAboutShredder = new JMenuItem("About Open Shredder");
+		mnHelp.add(itmAboutShredder);
+		itmAboutShredder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				About ab = new About();
+				ab.setVisible(true);
+			}
+		});
+	}
+
+	private void addFile() {
+		JFileChooser jfc = new JFileChooser();
+		jfc.setCurrentDirectory(new File("."));
+		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int tut = jfc.showOpenDialog(MainForm.this);
+		if (tut == JFileChooser.APPROVE_OPTION) {
+			initializeData(jfc.getSelectedFile());
+		}
+	}
+
+	private void addDirectory() {
+		JFileChooser jfc = new JFileChooser();
+		jfc.setCurrentDirectory(new File("."));
+		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int tut = jfc.showOpenDialog(MainForm.this);
+		if (tut == JFileChooser.APPROVE_OPTION) {
+			LoadListByPath(jfc.getSelectedFile().getAbsolutePath());
+
+		}
+	}
+
+	private void removeSelected() {
+		if (table.getRowCount() > 0 && table.getSelectedRow() != -1) {
+			int i = table.getSelectedRow();
+			String dirPath = (String) table.getValueAt(i, 1);
+			AbstractFileModel abs = (AbstractFileModel) table.getModel();
+			FileType type = (FileType) table.getValueAt(i, 3);// file_type //
+																// index
+			if (type == FileType.File)
+				abs.DeleteRow(i);
+			else if (type == FileType.Directory) {
+				int tut = JOptionPane.showConfirmDialog(MainForm.this,
+						"Are you sure want to remove  the folder and all its contents?");
+				if (tut == JOptionPane.YES_OPTION) {
+
+					for (int j = table.getRowCount(); j >= 0; j--) {
+						String str = (String) table.getValueAt(j, 1);
+						if (str.contains(dirPath)) {
+							abs.DeleteRow(j);
+							j++;
+						}
+					}
+					abs.DeleteRow(i);
+				}
+
+			}
+		}
+	}
+
+	private void clearList() {
+		if (table.getRowCount() > 0) {
+			AbstractFileModel abs = (AbstractFileModel) table.getModel();
+			abs.RemoveAll();
+		}
 	}
 
 	protected void addButtons(JToolBar toolBar) {
@@ -225,16 +368,12 @@ public class MainForm extends JFrame {
 		btnDosyaEkle = new JButton("Add File");
 		btnDosyaEkle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser jfc = new JFileChooser();
-				jfc.setCurrentDirectory(new File("."));
-				jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				int tut = jfc.showOpenDialog(MainForm.this);
-				if (tut == JFileChooser.APPROVE_OPTION) {
-					initializeData(jfc.getSelectedFile());
-				}
+				addFile();
 			}
+
 		});
-		btnDosyaEkle.setIcon(new ImageIcon(MainForm.class.getResource("/com/codepark/openshredder/images/Document-1-Add-icon.png")));
+		btnDosyaEkle.setIcon(
+				new ImageIcon(MainForm.class.getResource("/com/codepark/openshredder/images/Document-1-Add-icon.png")));
 		btnDosyaEkle.setToolTipText("Add single file");
 		toolBar.add(btnDosyaEkle);
 
@@ -243,17 +382,12 @@ public class MainForm extends JFrame {
 		btnKlasorEkle = new JButton("Add Folder");
 		btnKlasorEkle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser jfc = new JFileChooser();
-				jfc.setCurrentDirectory(new File("."));
-				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int tut = jfc.showOpenDialog(MainForm.this);
-				if (tut == JFileChooser.APPROVE_OPTION) {
-					LoadListByPath(jfc.getSelectedFile().getAbsolutePath());
-
-				}
+				addDirectory();
 			}
+
 		});
-		btnKlasorEkle.setIcon(new ImageIcon(MainForm.class.getResource("/com/codepark/openshredder/images/folder-add-icon.png")));
+		btnKlasorEkle.setIcon(
+				new ImageIcon(MainForm.class.getResource("/com/codepark/openshredder/images/folder-add-icon.png")));
 		btnKlasorEkle.setToolTipText("Add specific folder with subfolders and which includes files");
 		toolBar.add(btnKlasorEkle);
 
@@ -262,66 +396,14 @@ public class MainForm extends JFrame {
 		btnRemoveFile = new JButton("Remove Selected");
 		btnRemoveFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (table.getRowCount() > 0 && table.getSelectedRow() != -1) {
-					int i = table.getSelectedRow();
-					String dirPath = (String) table.getValueAt(i, 1);
-					AbstractFileModel abs = (AbstractFileModel) table.getModel();
-					FileType type = (FileType) table.getValueAt(i, 3);// file_type
-																		// //
-																		// index
-					if (type == FileType.File)
-						abs.DeleteRow(i);
-					else if (type == FileType.Directory) {
-						int tut = JOptionPane.showConfirmDialog(MainForm.this,
-								"Are you sure want to remove  the folder and all its contents?");
-						if (tut == JOptionPane.YES_OPTION) {
-
-							for (int j = table.getRowCount(); j >= 0; j--) {
-								String str = (String) table.getValueAt(j, 1);
-								if (str.contains(dirPath)) {
-									abs.DeleteRow(j);
-									j++;
-								}
-							}
-							abs.DeleteRow(i);
-						}
-
-					}
-				}
+				removeSelected();
 			}
+
 		});
-		btnRemoveFile.setIcon(new ImageIcon(MainForm.class.getResource("/com/codepark/openshredder/images/Document-1-Remove-icon.png")));
+		btnRemoveFile.setIcon(new ImageIcon(
+				MainForm.class.getResource("/com/codepark/openshredder/images/Document-1-Remove-icon.png")));
 
-		btnRemoveFile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (table.getRowCount() > 0 && table.getSelectedRow() != -1) {
-					int i = table.getSelectedRow();
-					String dirPath = (String) table.getValueAt(i, 1);
-					AbstractFileModel abs = (AbstractFileModel) table.getModel();
-					FileType type = (FileType) table.getValueAt(i, 3);// file_type
-																		// index
-					if (type == FileType.File)
-						abs.DeleteRow(i);
-					else if (type == FileType.Directory) {
-						int tut = JOptionPane.showConfirmDialog(MainForm.this,
-								"Are you sure want to remove  the folder and all its contents?");
-						if (tut == JOptionPane.YES_OPTION) {
-							abs.DeleteRow(i);
-
-							for (int j = 0; j < table.getRowCount(); j++) {
-								String str = (String) table.getValueAt(j, 1);
-								if (str.contains(dirPath)) {
-									abs.DeleteRow(j);
-									j--;
-								}
-							}
-						}
-
-					}
-				}
-			}
-		});
-		btnRemoveFile.setToolTipText("Removes selected lines in the list");
+		btnRemoveFile.setToolTipText("Removes selected lines in the list.");
 		toolBar.add(btnRemoveFile);
 
 		// toolBar.addSeparator();
@@ -329,12 +411,13 @@ public class MainForm extends JFrame {
 		btnRemoveAll = new JButton("Clear List");
 		btnRemoveAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				AbstractFileModel abs = (AbstractFileModel) table.getModel();
-				abs.RemoveAll();
+				clearList();
 			}
+
 		});
-		btnRemoveAll.setIcon(new ImageIcon(MainForm.class.getResource("/com/codepark/openshredder/images/window-app-list-close-icon.png")));
-		btnRemoveAll.setToolTipText("Clear all  entry in the list");
+		btnRemoveAll.setIcon(new ImageIcon(
+				MainForm.class.getResource("/com/codepark/openshredder/images/window-app-list-close-icon.png")));
+		btnRemoveAll.setToolTipText("Clear all  entry in the list.");
 		toolBar.add(btnRemoveAll);
 
 		toolBar.addSeparator();
@@ -343,6 +426,10 @@ public class MainForm extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (table.getRowCount() == 0) {
+					showMessage("List is empty.\nPlease add file or directory to shred.");
+					return;
+				}
 				List<String> lst = new ArrayList<String>();
 				for (int i = table.getRowCount() - 1; i >= 0; i--) {
 					lst.add((String) table.getValueAt(i, 1));
@@ -351,13 +438,13 @@ public class MainForm extends JFrame {
 				createDialog((JComponent) e.getSource(), prg, "Shred File!...", prg.getDimension());
 				checkFileList();
 				if (table.getRowCount() == 0) {
-					JOptionPane.showMessageDialog(null, "File shredding finished!");
+					showMessage("File shredding finished!");
 				}
 			}
 
 		});
 		btnStart.setToolTipText("Wipe Files in the List");
-		btnStart.setIcon(new ImageIcon(getClass().getResource("/com/codepark/openshredder/images/clear.png")));
+		btnStart.setIcon(new ImageIcon(MainForm.class.getResource("/com/codepark/openshredder/images/clear.png")));
 		toolBar.add(btnStart);
 
 		toolBar.addSeparator();
@@ -367,8 +454,7 @@ public class MainForm extends JFrame {
 
 			public void actionPerformed(ActionEvent e) {
 				ChooseDiskForm frm = new ChooseDiskForm(true);
-				createDialog((JComponent) e.getSource(), frm, "Choose File Storage ",
-						new Dimension(450, 500));
+				createDialog((JComponent) e.getSource(), frm, "Choose File Storage ", new Dimension(450, 500));
 				if (frm.getSelectedmountPoint().trim() != "") {
 					String tmp = frm.getSelectedmountPoint();
 					List<String> lst = new ArrayList<>();
@@ -376,7 +462,7 @@ public class MainForm extends JFrame {
 					ProgressPanel p = new ProgressPanel(lst, metod, true);
 					createDialog((Component) e.getSource(), p, "Wipe Free Space (" + tmp + ")", p.getDimension());
 					if (p.isFinished() == true) {
-						JOptionPane.showMessageDialog(null, tmp + " wipe free space finished");
+						showMessage(tmp + " wipe free space finished.");
 					}
 				}
 			}
@@ -398,15 +484,20 @@ public class MainForm extends JFrame {
 					ProgressPanel p = new ProgressPanel(lst, metod, false);
 					createDialog((Component) arg0.getSource(), p, "Disk Wipe (" + tmp + ")", p.getDimension());
 					if (p.isFinished() == true) {
-						JOptionPane.showMessageDialog(null, tmp + " wipe finished");
+						showMessage(tmp + " wipe finished");
 					}
 				}
 			}
 		});
-		btnDisk.setToolTipText("Fiziksel diski güvenli temizler");
-		btnDisk.setIcon(new ImageIcon(getClass().getResource("/com/codepark/openshredder/images/Apps-Drive-Harddisk-icon.png")));
+		btnDisk.setToolTipText("Secure clear  physical disk");
+		btnDisk.setIcon(new ImageIcon(
+				getClass().getResource("/com/codepark/openshredder/images/Apps-Drive-Harddisk-icon.png")));
 		toolBar.add(btnDisk);
 
+	}
+
+	private void showMessage(String message) {
+		JOptionPane.showMessageDialog(this, message);
 	}
 
 	private void checkFileList() {
@@ -464,5 +555,25 @@ public class MainForm extends JFrame {
 	protected void finalize() throws Throwable {
 		// TODO Auto-generated method stub
 		super.finalize();
+	}
+
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
 	}
 }

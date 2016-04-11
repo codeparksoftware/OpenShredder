@@ -65,7 +65,7 @@ public class ProgressPanel extends JPanel implements ShredObserver, Runnable {
 		pBarTotal.setStringPainted(true);
 		setBounds(20, 20, 453, 210);
 		JPanel panel = new JPanel();
-		panel.setBounds(20, 20, 410, 169);
+		panel.setBounds(20, 20, 410, 179);
 
 		add(panel);
 		panel.setLayout(null);
@@ -84,7 +84,7 @@ public class ProgressPanel extends JPanel implements ShredObserver, Runnable {
 			}
 		});
 
-		startButton.setBounds(31, 136, 91, 25);
+		startButton.setBounds(31, 125, 91, 25);
 		panel.add(startButton);
 
 		btnStop = new JButton("Stop");
@@ -105,7 +105,7 @@ public class ProgressPanel extends JPanel implements ShredObserver, Runnable {
 				startButton.setEnabled(true);
 			}
 		});
-		btnStop.setBounds(284, 136, 91, 25);
+		btnStop.setBounds(284, 125, 91, 25);
 		btnStop.setEnabled(false);
 		panel.add(btnStop);
 
