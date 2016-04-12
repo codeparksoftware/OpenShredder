@@ -27,7 +27,7 @@ public class Body implements ShredObservable, Runnable {
 	private final short id;
 	private ArrayList<ShredObserver> lst;
 	private final Object MUTEX;
-	private boolean changed;
+	
 	private Thread t;
 
 	public Body(File f, short id) {
@@ -51,7 +51,7 @@ public class Body implements ShredObservable, Runnable {
 	}
 
 	public void percent(long currentValue, long totalMax) {
-		this.changed = true;
+	
 		notifyServer((currentValue * 100) / totalMax);
 
 	}

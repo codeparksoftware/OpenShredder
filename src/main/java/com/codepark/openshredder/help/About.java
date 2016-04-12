@@ -5,6 +5,7 @@ package com.codepark.openshredder.help;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -18,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import java.awt.Font;
 
 /**
  * @author root

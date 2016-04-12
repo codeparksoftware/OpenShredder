@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class AbstractDiskModel extends AbstractTableModel {
 	private String[] columnNames;
-	protected Vector dataVector;
+	protected Vector<Object> dataVector;
 
 	public AbstractDiskModel(String[] columns) {
 		columnNames = columns;

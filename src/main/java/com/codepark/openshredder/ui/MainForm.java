@@ -18,9 +18,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -38,6 +39,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -50,10 +52,10 @@ import javax.swing.table.TableCellRenderer;
 import com.codepark.openshredder.base.WipeMethod;
 import com.codepark.openshredder.help.About;
 import com.codepark.openshredder.help.AboutUs;
+import com.codepark.openshredder.jarinfo.JarAttributes;
+import com.codepark.openshredder.jarinfo.JarUtil;
 
-import javax.swing.JPopupMenu;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import updater.FileDownload;
 
 public class MainForm extends JFrame {
 
@@ -76,22 +78,6 @@ public class MainForm extends JFrame {
 		pack();
 
 		// TheVersionClass();
-	}
-
-	public void TheVersionClass() {
-		InputStream resourceAsStream = this.getClass()
-				.getResourceAsStream("/META-INF/maven/com.soebes.examples/version-examples-i/pom.properties");
-		this.prop = new Properties();
-
-		try {
-			this.prop.load(resourceAsStream);
-			while (this.prop.keys().hasMoreElements())
-				System.out.println(this.prop.keys().nextElement().toString());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 	private void setContentUI() {
@@ -292,6 +278,7 @@ public class MainForm extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				AboutUs ab = new AboutUs();
+				ab.setLocationRelativeTo(null);
 				ab.setVisible(true);
 			}
 		});
@@ -302,7 +289,25 @@ public class MainForm extends JFrame {
 		itmAboutShredder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				About ab = new About();
+				ab.setLocationRelativeTo(null);
 				ab.setVisible(true);
+			}
+		});
+		JMenuItem itmCheckUpdate = new JMenuItem("Check for Update");
+		mnHelp.add(itmCheckUpdate);
+		itmCheckUpdate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				FileDownload file = new FileDownload();
+				String tmpFile = JarUtil.getStartupPath() + "\\jar.tmp";
+				file.download(
+						"https://github.com/codeparksoftware/OpenShredder/blob/master/miglayout15-swing.jar?raw=true",
+						tmpFile);
+				JarAttributes jar = new JarAttributes(tmpFile);
+				String newJar=jar.getVersion();
+				String oldJar=new JarAttributes(JarUtil.getExecutablePath()).getVersion();
+				if(newJar.compareTo(oldJar)>0)
+					showMessage(newJar+"---"+oldJar+"\nan update found");
 			}
 		});
 	}

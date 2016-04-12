@@ -23,13 +23,15 @@ public class EvenOddRenderer implements TableCellRenderer {
 		Component renderer = render.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		((JLabel) renderer).setOpaque(true);
 		Color foreground = Color.BLACK, background = Color.white;
+		float[] hsbValues = new float[3];
+		Color.RGBtoHSB(234, 241, 241, hsbValues);
 		if (isSelected) {
 			foreground = Color.WHITE;
 			background = Color.BLUE;
 		} else {
 			if (row % 2 == 0) {
 				foreground = Color.BLACK;
-				background = Color.LIGHT_GRAY;
+				background = Color.getHSBColor(hsbValues[0], hsbValues[1], hsbValues[2]);
 			} else if (row % 2 == 1) {
 				foreground = Color.BLACK;
 				background = (Color.WHITE);

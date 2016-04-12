@@ -5,6 +5,10 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystems;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -18,21 +22,46 @@ import com.codepark.openshredder.system.OSDetector;
 import com.codepark.openshredder.system.SystemUtil;
 
 public class ChooseDiskForm extends JPanel {
-	public static final String[] columnNames = { "Tip", "Etiket", "Depolama Birimi", "Uzunluk", "Dosya Yolu",
-			"Baglanti Noktasi" };
+	public static final String[] columnNames = { "Type", "Label", "Storage", "Size", "Path", "Mount Point" };
 
 	public ChooseDiskForm(boolean mountPointOnly) {
 		setLayout(new BorderLayout(0, 0));
-
 		setJTable((JPanel) this);
-
 		getDisks(mountPointOnly);
 	}
 
 	private void getDisks(boolean mountPointOnly) {
 		if (OSDetector.isUnix()) {
 			getDisksforLinux(mountPointOnly);
+		} else if (OSDetector.isWindows()) {
+			getDisksforWin();
+
 		}
+	}
+
+	private void getDisksforWin() {
+		AbstractDiskModel disk = (AbstractDiskModel) table.getModel();
+		disk.RemoveAll();
+		List<String> lstType = new ArrayList<String>();
+		List<String> lstSize = new ArrayList<String>();
+		List<String> lst = new ArrayList<String>();
+		for (FileStore store : FileSystems.getDefault().getFileStores()) {
+
+			lstType.add(store.type());
+			try {
+				lstSize.add(String.valueOf(store.getTotalSpace()));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			lst.add(store.name());
+
+			System.out.println(store.name());
+			System.out.println(store.type());
+		
+
+		}
+
 	}
 
 	private void getDisksforLinux(boolean mountPointOnly) {
