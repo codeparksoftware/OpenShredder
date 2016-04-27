@@ -4,10 +4,8 @@ import static java.awt.event.ItemEvent.SELECTED;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -24,14 +22,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DropMode;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -45,33 +41,35 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 import javax.swing.table.TableCellRenderer;
 
-import com.codepark.openshredder.base.WipeMethod;
+import org.apache.log4j.Logger;
+
+import com.codepark.openshredder.common.MessageBox;
+import com.codepark.openshredder.common.Strings;
 import com.codepark.openshredder.help.About;
 import com.codepark.openshredder.help.AboutUs;
-import com.codepark.openshredder.jarinfo.JarAttributes;
+import com.codepark.openshredder.help.CheckVersion;
 import com.codepark.openshredder.jarinfo.JarUtil;
-
-import updater.FileDownload;
+import com.codepark.openshredder.shred.WipeMethod;
 
 public class MainForm extends JFrame {
 
-	private JDialog dialog;
+	private static final Logger logger = Logger.getLogger(MainForm.class);
 	private WipeMethod metod = WipeMethod.DoD;
 	private JButton btnDosyaEkle, btnKlasorEkle, btnRemoveFile, btnRemoveAll, btnStart, btnPart, btnDisk;
 	private JTable table;
-	private Properties prop;
+
 	public static final String[] columnNames = { "Icon", "File", "Size", "Type", "Last Modified Time",
 			"Last Accessed Time", "Created Time" };
+	private static final String CONFIRM_REMOVE = "Are you sure want to remove  the folder and all its contents?";
+	private static final String ADD_FILE = "Add single file";
 
 	public MainForm() {
 
 		setIconImage(Toolkit.getDefaultToolkit()
 				.getImage(MainForm.class.getResource("/com/codepark/openshredder/images/main_icon.png")));
-		setTitle("Open Shredder");
+		setTitle(Strings.PROD_NAME);
 		this.setSize(104, 768);
 		initializeMenu();
 		setContentUI();
@@ -89,8 +87,8 @@ public class MainForm extends JFrame {
 		panel.add(panel_1, BorderLayout.CENTER);
 		panel_1.setLayout(new BorderLayout(0, 0));
 
-		JToolBar toolBar = new JToolBar("Shred Navigator");
-		toolBar.setToolTipText("Shred Navigator");
+		JToolBar toolBar = new JToolBar();
+		toolBar.setToolTipText(Strings.PROD_NAME + " navigator");
 		addButtons(toolBar);
 		toolBar.setRollover(true);
 
@@ -135,11 +133,8 @@ public class MainForm extends JFrame {
 					try {
 						fileList = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
 
-					} catch (UnsupportedFlavorException e) {
-
-						return;
-					} catch (IOException e) {
-
+					} catch (IOException | UnsupportedFlavorException e) {
+						logger.debug(e.getMessage(), e);
 						return;
 					}
 					for (int i = 0; i < fileList.size(); i++) {
@@ -159,7 +154,7 @@ public class MainForm extends JFrame {
 		JPopupMenu popupMenu = new JPopupMenu();
 		addPopup(table, popupMenu);
 
-		JMenuItem itmAddFile = new JMenuItem("Add File");
+		JMenuItem itmAddFile = new JMenuItem(ADD_FILE);
 		itmAddFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				addFile();
@@ -297,20 +292,20 @@ public class MainForm extends JFrame {
 		mnHelp.add(itmCheckUpdate);
 		itmCheckUpdate.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				FileDownload file = new FileDownload();
-				String tmpFile = JarUtil.getStartupPath() + "\\jar.tmp";
-				file.download(
-						"https://github.com/codeparksoftware/OpenShredder/blob/master/miglayout15-swing.jar?raw=true",
-						tmpFile);
-				JarAttributes jar = new JarAttributes(tmpFile);
-				String newJar=jar.getVersion();
-				String oldJar=new JarAttributes(JarUtil.getExecutablePath()).getVersion();
-				if(newJar.compareTo(oldJar)>0)
-					showMessage(newJar+"---"+oldJar+"\nan update found");
+			public void actionPerformed(ActionEvent e) {
+				String oldFile = JarUtil.getExecutablePath();
+				String remoteFile = "https://raw.githubusercontent.com/codeparksoftware/OpenShredder/master/Shredder.jar";
+				CheckVersion frm = new CheckVersion(oldFile, remoteFile);
+
+				Dialog d = new Dialog();
+				d.createDialog((Component) frm, "OpenShredder update", ((BaseProgressPanel) frm).getDimension());
+			 
 			}
+
 		});
 	}
+
+
 
 	private void addFile() {
 		JFileChooser jfc = new JFileChooser();
@@ -343,8 +338,7 @@ public class MainForm extends JFrame {
 			if (type == FileType.File)
 				abs.DeleteRow(i);
 			else if (type == FileType.Directory) {
-				int tut = JOptionPane.showConfirmDialog(MainForm.this,
-						"Are you sure want to remove  the folder and all its contents?");
+				int tut = JOptionPane.showConfirmDialog(MainForm.this, CONFIRM_REMOVE);
 				if (tut == JOptionPane.YES_OPTION) {
 
 					for (int j = table.getRowCount(); j >= 0; j--) {
@@ -432,18 +426,19 @@ public class MainForm extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (table.getRowCount() == 0) {
-					showMessage("List is empty.\nPlease add file or directory to shred.");
+					MessageBox.showMessage("List is empty.\nPlease add file or directory to shred.");
 					return;
 				}
 				List<String> lst = new ArrayList<String>();
 				for (int i = table.getRowCount() - 1; i >= 0; i--) {
 					lst.add((String) table.getValueAt(i, 1));
 				}
-				ProgressPanel prg = new ProgressPanel(lst, metod, false);
-				createDialog((JComponent) e.getSource(), prg, "Shred File!...", prg.getDimension());
+				ShredProgress prg = new ShredProgress(lst, metod, false);
+				Dialog d = new Dialog();
+				d.createDialog((JComponent) e.getSource(), prg, "Shred File!...", prg.getDimension());
 				checkFileList();
 				if (table.getRowCount() == 0) {
-					showMessage("File shredding finished!");
+					MessageBox.showMessage("File shredding finished!");
 				}
 			}
 
@@ -459,15 +454,16 @@ public class MainForm extends JFrame {
 
 			public void actionPerformed(ActionEvent e) {
 				ChooseDiskForm frm = new ChooseDiskForm(true);
-				createDialog((JComponent) e.getSource(), frm, "Choose File Storage ", new Dimension(450, 500));
+				Dialog d = new Dialog();
+				d.createDialog((JComponent) e.getSource(), frm, "Choose File Storage ", new Dimension(450, 500));
 				if (frm.getSelectedmountPoint().trim() != "") {
 					String tmp = frm.getSelectedmountPoint();
 					List<String> lst = new ArrayList<>();
 					lst.add(tmp);
-					ProgressPanel p = new ProgressPanel(lst, metod, true);
-					createDialog((Component) e.getSource(), p, "Wipe Free Space (" + tmp + ")", p.getDimension());
+					ShredProgress p = new ShredProgress(lst, metod, true);
+					d.createDialog((Component) e.getSource(), p, "Wipe Free Space (" + tmp + ")", p.getDimension());
 					if (p.isFinished() == true) {
-						showMessage(tmp + " wipe free space finished.");
+						MessageBox.showMessage(tmp + " wipe free space finished.");
 					}
 				}
 			}
@@ -481,15 +477,16 @@ public class MainForm extends JFrame {
 
 			public void actionPerformed(ActionEvent arg0) {
 				ChooseDiskForm frm = new ChooseDiskForm(false);
-				createDialog((JComponent) arg0.getSource(), frm, "Choose Mounted Disk", new Dimension(450, 500));
+				Dialog d = new Dialog();
+				d.createDialog((JComponent) arg0.getSource(), frm, "Choose Mounted Disk", new Dimension(450, 500));
 				if (frm.getPath().trim() != "") {
 					String tmp = frm.getPath();
 					List<String> lst = new ArrayList<>();
 					lst.add(tmp);
-					ProgressPanel p = new ProgressPanel(lst, metod, false);
-					createDialog((Component) arg0.getSource(), p, "Disk Wipe (" + tmp + ")", p.getDimension());
+					ShredProgress p = new ShredProgress(lst, metod, false);
+					d.createDialog((Component) arg0.getSource(), p, "Disk Wipe (" + tmp + ")", p.getDimension());
 					if (p.isFinished() == true) {
-						showMessage(tmp + " wipe finished");
+						MessageBox.showMessage(tmp + " wipe finished");
 					}
 				}
 			}
@@ -499,10 +496,6 @@ public class MainForm extends JFrame {
 				getClass().getResource("/com/codepark/openshredder/images/Apps-Drive-Harddisk-icon.png")));
 		toolBar.add(btnDisk);
 
-	}
-
-	private void showMessage(String message) {
-		JOptionPane.showMessageDialog(this, message);
 	}
 
 	private void checkFileList() {
@@ -534,31 +527,15 @@ public class MainForm extends JFrame {
 					}
 				}
 			} else {
-				System.err.println(text);
+				logger.error(text);
+
 			}
 		}
 	}
 
-	private void createDialog(Component arg0, Component frm, String str, Dimension dim) {
-
-		JComponent comp = (JComponent) arg0;
-		Window win = (Window) SwingUtilities.getWindowAncestor(comp);
-		if (win != null) {
-			dialog = new JDialog(win, str, ModalityType.APPLICATION_MODAL);
-			dialog.getContentPane().add(frm);
-			dialog.pack();
-			dialog.setLocationRelativeTo(null);
-			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			dialog.setSize(dim);
-			dialog.setLocationRelativeTo(comp);
-		}
-
-		dialog.setVisible(true); // here the modal dialog takes over
-	}
-
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
+
 		super.finalize();
 	}
 

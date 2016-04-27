@@ -1,4 +1,4 @@
-package com.codepark.openshredder.base;
+package com.codepark.openshredder.shred;
 /*
  * Clear Directories' meta data.
  */
@@ -31,7 +31,7 @@ public class ShredMetaData implements IShred {
 		MetaData m = new MetaData(f);
 		m.SetWritable();
 		m.add(sho);
-		m.startClear();
-		m.finalize();
+		m.start();
+		m.finish();
 	}
 }

@@ -1,4 +1,4 @@
-package com.codepark.openshredder.base;
+package com.codepark.openshredder.shred;
 /*@author Selami
  * 25.03.2016
  * Regular file wipes with Dod algorithms.This class extends ShredFile.
@@ -23,10 +23,10 @@ public class ShredFileDod extends ShredFile {
 		for (int i = 1; i < 4; i++) {
 			bd = new Body(f, (short) i);
 			bd.add(sho);
-			bd.startWipe();// Wiping body
+			bd.start();// Wiping body
 		}
 		bd.SetFileLength();
-		m.startClear();
+		m.start();
 		f.delete();
 	}
 

@@ -1,4 +1,5 @@
-package com.codepark.openshredder.base;
+package com.codepark.openshredder.shred;
+
 /*
 Author Selami
  25.03.2016
@@ -20,19 +21,19 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 import com.codepark.openshredder.system.OSDetector;
 import com.codepark.openshredder.system.SystemUtil;
 
-public class MetaData implements ShredObservable, Runnable {
-	boolean changed;
+public class MetaData extends Job {
+
 	File file;
 	Random rand;
-	ArrayList<ShredObserver> lst;
-	final Object MUTEX;
-	private Thread t;
+
+	private static final Logger logger = Logger.getLogger(MetaData.class);
 
 	public MetaData(File f) {
 
@@ -43,29 +44,17 @@ public class MetaData implements ShredObservable, Runnable {
 
 	}
 
-	public void startClear() {
-		t = new Thread(this);
-		this.t.start();
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	public void doJob() {
 
-	public void metaDataClear() {
-
-		this.changed = true;
-		percent(10);
+		percent(10, 100);
 		SetFlag();
-		percent(30);
+		percent(30, 100);
 		SetCreationTime();
-		percent(60);
+		percent(60, 100);
 		SetLastAccessedTime();
-		percent(80);
+		percent(80, 100);
 		SetLastModifiedTime();
-		percent(100);
+		percent(100, 100);
 	}
 
 	private void SetFlag() {
@@ -85,8 +74,7 @@ public class MetaData implements ShredObservable, Runnable {
 		try {
 			path = Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage(), e);
 		}
 
 		return path.toString();
@@ -102,8 +90,7 @@ public class MetaData implements ShredObservable, Runnable {
 			FileTime fileTime = FileTime.fromMillis(rand.nextLong());
 			Files.setLastModifiedTime(file.toPath(), fileTime);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage(), e);
 		}
 	}
 
@@ -114,8 +101,7 @@ public class MetaData implements ShredObservable, Runnable {
 			/* Change Created Time Stamp */
 			Files.setAttribute(this.file.toPath(), "lastAccessTime", fileTime);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage(), e);
 		}
 	}
 
@@ -126,91 +112,8 @@ public class MetaData implements ShredObservable, Runnable {
 			/* Change Created Time Stamp */
 			Files.setAttribute(file.toPath(), "basic:creationTime", fileTime, NOFOLLOW_LINKS);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage(), e);
 		}
-	}
-
-	public void add(ShredObserver o) {
-		if (o == null)
-			throw new NullPointerException();
-		synchronized (MUTEX) {
-			if (lst.contains(o) == false)
-				lst.add(o);
-		}
-
-	}
-
-	@Override
-	public void remove(ShredObserver o) {
-		synchronized (MUTEX) {
-			if (lst.contains(o) == false)
-				lst.remove(o);
-		}
-
-	}
-
-	public void percent(long currentValue) {
-		this.changed = true;
-		notifyServer(currentValue);
-
-	}
-
-	@Override
-	public void notifyServer(long val) {
-		List<ShredObserver> list;
-		synchronized (MUTEX) {
-
-			if (changed == false)
-				return;// Hiç değişiklik yok demektir
-			list = new ArrayList<>(this.lst);
-
-		}
-		for (ShredObserver o : list) {
-			o.update((int) val);
-
-		}
-
-	}
-
-	public void finalize() {
-		lst.clear();
-
-	}
-
-	@Override
-	public void run() {
-
-		metaDataClear();
-
-	}
-
-	public void addThreadId(long val) {
-
-		List<ShredObserver> list;
-		synchronized (MUTEX) {
-
-			list = new ArrayList<>(this.lst);
-
-		}
-		for (ShredObserver o : list) {
-			o.addThreadId(val);
-		}
-
-	}
-
-	public void removeThreadId(long val) {
-
-		List<ShredObserver> list;
-		synchronized (MUTEX) {
-
-			list = new ArrayList<>(this.lst);
-
-		}
-		for (ShredObserver o : list) {
-			o.removeThreadId(val);
-		}
-
 	}
 
 }

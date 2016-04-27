@@ -1,4 +1,4 @@
-package com.codepark.openshredder.base;
+package com.codepark.openshredder.shred;
 
 public enum WipeMethod {
 Zero,

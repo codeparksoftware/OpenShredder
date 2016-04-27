@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 
+import org.apache.log4j.Logger;
+
 public class FileInfo {
 	private String filePath;
+	private static final Logger logger = Logger.getLogger(FileInfo.class);
 
 	public FileInfo(String path) {
 		this.filePath = path;
@@ -60,8 +63,7 @@ public class FileInfo {
 				try {
 					return store.getUsableSpace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.debug(e.getMessage(), e);
 				}
 			}
 		}

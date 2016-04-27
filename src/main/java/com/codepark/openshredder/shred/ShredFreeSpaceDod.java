@@ -1,5 +1,5 @@
 
-package com.codepark.openshredder.base;
+package com.codepark.openshredder.shred;
 
 import java.io.File;
 

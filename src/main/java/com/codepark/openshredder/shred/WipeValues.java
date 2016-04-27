@@ -1,5 +1,5 @@
 
-package com.codepark.openshredder.base;
+package com.codepark.openshredder.shred;
 /*
  *  Wipe Values is factory byte array is used in wipe process. This program uses Zero and DoD algorithms.
  *  And Wipe function needs this value array.all values are static but only Random Values  are dynamically 

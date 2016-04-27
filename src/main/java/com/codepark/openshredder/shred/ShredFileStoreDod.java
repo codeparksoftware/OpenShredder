@@ -1,4 +1,4 @@
-package com.codepark.openshredder.base;
+package com.codepark.openshredder.shred;
 
 import java.io.File;
 /*
@@ -20,9 +20,9 @@ public class ShredFileStoreDod extends ShredFileStore {
 			bd = new Body(f, (short) i);
 			bd.add(sho);
  
-			bd.startWipe();// Wiping body
+			bd.start();// Wiping body
 		 
-			m.startClear();
+			m.start();
 		}
 
 	}

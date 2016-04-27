@@ -17,12 +17,16 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Logger;
+
+import com.codepark.openshredder.help.CheckVersion;
 import com.codepark.openshredder.system.FileInfo;
 import com.codepark.openshredder.system.OSDetector;
 import com.codepark.openshredder.system.SystemUtil;
 
 public class ChooseDiskForm extends JPanel {
 	public static final String[] columnNames = { "Type", "Label", "Storage", "Size", "Path", "Mount Point" };
+	private static final Logger logger = Logger.getLogger(CheckVersion.class);
 
 	public ChooseDiskForm(boolean mountPointOnly) {
 		setLayout(new BorderLayout(0, 0));
@@ -51,14 +55,12 @@ public class ChooseDiskForm extends JPanel {
 			try {
 				lstSize.add(String.valueOf(store.getTotalSpace()));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.debug(e.getMessage(), e);
 			}
 			lst.add(store.name());
 
 			System.out.println(store.name());
 			System.out.println(store.type());
-		
 
 		}
 
@@ -112,8 +114,7 @@ public class ChooseDiskForm extends JPanel {
 						Window window = SwingUtilities.getWindowAncestor(ChooseDiskForm.this);
 						window.setVisible(false);
 					} catch (Throwable e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						logger.debug(e1.getMessage(), e1);
 					}
 				}
 			}

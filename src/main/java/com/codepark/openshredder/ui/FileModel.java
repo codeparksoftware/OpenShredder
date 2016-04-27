@@ -8,7 +8,12 @@ import java.nio.file.attribute.FileTime;
 
 import javax.swing.ImageIcon;
 
+import org.apache.log4j.Logger;
+
 public class FileModel {
+
+	private static final Logger logger = Logger.getLogger(FileModel.class);
+
 	public FileModel(File f) {
 
 		setFileName(f.getAbsolutePath());
@@ -22,8 +27,7 @@ public class FileModel {
 			setLastModified((FileTime) Files.getAttribute(f.toPath(), "lastModifiedTime"));
 			setLastAccess((FileTime) Files.getAttribute(f.toPath(), "lastAccessTime"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage(), e);
 		}
 
 	}
@@ -35,8 +39,7 @@ public class FileModel {
 			return new RandomAccessFile(f, "r").length();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.debug(e.getMessage(), e);
 		}
 		return 0;
 	}
