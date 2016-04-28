@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Created-By: Selami
+Main-Class: updater.Update
+Class-Path: .
+Name: Updater
+Specification-Title: Open Program Updater
+Specification-Version: 0.0.1
+Specification-Vendor: CodePark
+Licence: GPL v3
+Built-By: Selami
+Build-Jdk: 1.8.0_66
+Implementation-Title: Open Program Updater
+Implementation-Version: 0.0.1
+Implementation-Vendor-Id: updater
+Implementation-Vendor: CodePark

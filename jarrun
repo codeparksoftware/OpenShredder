@@ -1,0 +1,18 @@
+File jarfile = new File(updaterPath);
+			JarFile jar = new JarFile(jarfile);
+
+			Manifest manifest = jar.getManifest();
+			Attributes attrs = manifest.getMainAttributes();
+			String mainClassName = attrs.getValue("Main-Class");
+			URL url = new URL("file", null, jarfile.getAbsolutePath());
+			ClassLoader cl = new URLClassLoader(new URL[] { url });
+			Class mainClass;
+
+			mainClass = cl.loadClass(mainClassName);
+
+			Method mainMethod = mainClass.getMethod("main", new Class[] { String[].class });
+			String[] args = new String[3];
+			args[0] = oldFile;
+			args[1] = newFile;
+			args[2] = appName;
+			mainMethod.invoke(mainClass, new Object[] { args });

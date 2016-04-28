@@ -50,6 +50,7 @@ import com.codepark.openshredder.common.Strings;
 import com.codepark.openshredder.help.About;
 import com.codepark.openshredder.help.AboutUs;
 import com.codepark.openshredder.help.CheckVersion;
+import com.codepark.openshredder.jarinfo.JarAttributes;
 import com.codepark.openshredder.jarinfo.JarUtil;
 import com.codepark.openshredder.shred.WipeMethod;
 
@@ -294,18 +295,17 @@ public class MainForm extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String oldFile = JarUtil.getExecutablePath();
-				String remoteFile = "https://raw.githubusercontent.com/codeparksoftware/OpenShredder/master/Shredder.jar";
+				JarAttributes jar = new JarAttributes(JarUtil.makeJarURLforLocal(oldFile));
+				String remoteFile = jar.getUpdatePath();
 				CheckVersion frm = new CheckVersion(oldFile, remoteFile);
 
 				Dialog d = new Dialog();
 				d.createDialog((Component) frm, "OpenShredder update", ((BaseProgressPanel) frm).getDimension());
-			 
+
 			}
 
 		});
 	}
-
-
 
 	private void addFile() {
 		JFileChooser jfc = new JFileChooser();
