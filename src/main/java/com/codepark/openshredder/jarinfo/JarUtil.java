@@ -6,15 +6,15 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.codepark.openshredder.common.MessageBox;
 import com.codepark.openshredder.ui.MainForm;
 
 public class JarUtil {
 
-	private static final Logger logger = Logger.getLogger(JarUtil.class);
+	private static final Logger logger = Logger.getLogger(JarUtil.class.getName());
 
 	public static String getExecutablePath() {
 		CodeSource codeSource = MainForm.class.getProtectionDomain().getCodeSource();
@@ -23,7 +23,7 @@ public class JarUtil {
 			jarFile = new File(codeSource.getLocation().toURI().getPath());
 		} catch (URISyntaxException e) {
 
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 			return "";
 		}
 		return jarFile.getAbsolutePath();
@@ -39,7 +39,7 @@ public class JarUtil {
 		try {
 			return new URL(str);
 		} catch (MalformedURLException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;
 	}
@@ -49,7 +49,7 @@ public class JarUtil {
 		try {
 			return new URL(str);
 		} catch (MalformedURLException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;
 	}
@@ -60,7 +60,7 @@ public class JarUtil {
 			return true;
 		} catch (IOException e) {
 
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 			return false;
 		}
 	}

@@ -1,6 +1,7 @@
 package com.codepark.openshredder.shred;
 
 import java.io.File;
+
 /*
  * @author Selami
  * 23.05.2016
@@ -21,9 +22,9 @@ public class ShredFileStore implements IShred {
 		Body bd = new Body(f, (short) 0);
 		bd.add(sho);
 		bd.start();// Wipe Zero
-		
+
 		m.start();
-		
+
 	}
 
 }

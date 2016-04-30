@@ -14,7 +14,7 @@ import java.io.File;
 import com.codepark.openshredder.system.FileInfo;
 
 public class ShredFactory {
-	
+
 	public IShred ShredType(boolean wipeFreeSpace, WipeMethod wipe, String path) {
 		File f = new File(path);
 		if (!f.exists()) {

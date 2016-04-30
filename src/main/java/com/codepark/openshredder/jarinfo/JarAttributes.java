@@ -6,8 +6,8 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class JarAttributes {
 	private Manifest manifest;
@@ -19,7 +19,7 @@ public class JarAttributes {
 	private String updatePath;
 	private JarURLConnection jarConnection;
 
-	private static final Logger logger = Logger.getLogger(JarAttributes.class);
+	private static final Logger logger = Logger.getLogger(JarAttributes.class.getName());
 
 	public JarAttributes(URL url) {
 
@@ -36,7 +36,7 @@ public class JarAttributes {
 			setUpdatePath(getInfo("Update-Path"));
 			jarFile.close();
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 
 	}

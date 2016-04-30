@@ -3,12 +3,11 @@ package com.codepark.openshredder.updater;
 import java.awt.Component;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import org.apache.log4j.Logger;
-
 import com.codepark.openshredder.common.MessageBox;
 import com.codepark.openshredder.system.SystemUtil;
 import com.codepark.openshredder.ui.BaseProgressPanel;
@@ -21,11 +20,11 @@ public class Update {
 	 * arg[0] main application path arg[1] url to fetch new jar arg[2] App Name
 	 * 
 	 */
-	private static final Logger logger = Logger.getLogger(Program.class);
+	private static final Logger logger = Logger.getLogger(Update.class.getName());
 
 	public static void main(String[] args) {
 		checkMethod(args);
-//		BasicConfigurator.configure();
+		// BasicConfigurator.configure();
 		java.awt.EventQueue.invokeLater(new Runnable() {
 
 			@Override
@@ -34,13 +33,13 @@ public class Update {
 				try {
 					UIManager.setLookAndFeel(new UIFactory().getDefaultUI());
 				} catch (ClassNotFoundException e) {
-					logger.debug(e.getMessage(), e);
+					logger.log(Level.SEVERE, e.getMessage(), e);
 				} catch (InstantiationException e) {
-					logger.debug(e.getMessage(), e);
+					logger.log(Level.SEVERE, e.getMessage(), e);
 				} catch (IllegalAccessException e) {
-					logger.debug(e.getMessage(), e);
+					logger.log(Level.SEVERE, e.getMessage(), e);
 				} catch (UnsupportedLookAndFeelException e) {
-					logger.debug(e.getMessage(), e);
+					logger.log(Level.SEVERE, e.getMessage(), e);
 				}
 
 				UpdatePanel frm = new UpdatePanel(args);

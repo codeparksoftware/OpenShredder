@@ -3,12 +3,12 @@ package com.codepark.openshredder.system;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileInfo {
 	private String filePath;
-	private static final Logger logger = Logger.getLogger(FileInfo.class);
+	private static final Logger logger = Logger.getLogger(FileInfo.class.getName());
 
 	public FileInfo(String path) {
 		this.filePath = path;
@@ -63,7 +63,7 @@ public class FileInfo {
 				try {
 					return store.getUsableSpace();
 				} catch (IOException e) {
-					logger.debug(e.getMessage(), e);
+					logger.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}
 		}

@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import org.apache.log4j.Logger;
-
 public class FileModel {
 
-	private static final Logger logger = Logger.getLogger(FileModel.class);
+	private static final Logger logger = Logger.getLogger(FileModel.class.getName());
 
 	public FileModel(File f) {
 
@@ -27,7 +27,7 @@ public class FileModel {
 			setLastModified((FileTime) Files.getAttribute(f.toPath(), "lastModifiedTime"));
 			setLastAccess((FileTime) Files.getAttribute(f.toPath(), "lastAccessTime"));
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 
 	}
@@ -39,7 +39,7 @@ public class FileModel {
 			return new RandomAccessFile(f, "r").length();
 
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -132,7 +132,6 @@ public class FileModel {
 		default:
 			return new Object();
 		}
-
 	}
 
 	public void setValue(Object value, int colIndex) {
@@ -153,9 +152,7 @@ public class FileModel {
 			setImg((ImageIcon) value);
 		default:
 			System.out.println("No such column   in here!...");
-
 		}
-
 	}
 
 	public ImageIcon getImg() {

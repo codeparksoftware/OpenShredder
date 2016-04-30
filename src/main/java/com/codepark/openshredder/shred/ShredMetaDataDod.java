@@ -1,4 +1,5 @@
 package com.codepark.openshredder.shred;
+
 /*
  * @author Selami
  * This class extends ShredMetaData.

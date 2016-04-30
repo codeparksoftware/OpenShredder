@@ -6,13 +6,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JProgressBar;
-
-import org.apache.log4j.Logger;
-
-import com.codepark.openshredder.help.CheckVersion;
 import com.codepark.openshredder.shred.IShred;
 import com.codepark.openshredder.shred.ShredFactory;
 import com.codepark.openshredder.shred.WipeMethod;
@@ -30,7 +27,7 @@ public class ShredProgress extends BaseProgressPanel {
 	private boolean wipeFreeSpace = false;
 	private int tmp = 0;
 
-	private static final Logger logger = Logger.getLogger(CheckVersion.class);
+	private static final Logger logger = Logger.getLogger(ShredProgress.class.getName());
 
 	public ShredProgress(List<String> lst, WipeMethod wip, boolean wipeFreeSpace) {
 

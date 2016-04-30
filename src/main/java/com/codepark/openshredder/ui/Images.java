@@ -3,7 +3,7 @@ package com.codepark.openshredder.ui;
 import javax.swing.ImageIcon;
 
 public class Images {
- 
+
 	public ImageIcon defImg = new ImageIcon("/com/sun/java/swing/plaf/windows/icons/image-delayed.png");
 
 	public ImageIcon getFileImg() {
@@ -23,5 +23,4 @@ public class Images {
 		return new ImageIcon(getClass().getResource("/images/disk-icon.png"));
 	}
 
-	 
 }

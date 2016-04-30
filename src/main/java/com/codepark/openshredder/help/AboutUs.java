@@ -32,14 +32,16 @@ public class AboutUs extends JFrame {
 	 */
 	public AboutUs() throws HeadlessException {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setIconImage(Toolkit.getDefaultToolkit().getImage(AboutUs.class.getResource("/com/sun/javafx/scene/control/skin/caspian/dialog-confirm.png")));
+		setIconImage(Toolkit.getDefaultToolkit()
+				.getImage(AboutUs.class.getResource("/com/sun/javafx/scene/control/skin/caspian/dialog-confirm.png")));
 		this.setSize(new Dimension(600, 350));
 		setResizable(false);
 		setTitle("About CodePark");
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon(AboutUs.class.getResource("/com/codepark/openshredder/images/codepark144.png")));
+		lblNewLabel
+				.setIcon(new ImageIcon(AboutUs.class.getResource("/com/codepark/openshredder/images/codepark144.png")));
 		getContentPane().add(lblNewLabel, BorderLayout.WEST);
 
 		JPanel panel = new JPanel();
@@ -114,8 +116,7 @@ public class AboutUs extends JFrame {
 		txtrOpenShredderIs.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 11));
 		txtrOpenShredderIs.setWrapStyleWord(true);
 		txtrOpenShredderIs.setBackground(UIManager.getColor("Button.background"));
-		txtrOpenShredderIs.setText(
-				"CodePark\r\nOpen Source software.");
+		txtrOpenShredderIs.setText("CodePark\r\nOpen Source software.");
 		txtrOpenShredderIs.setEditable(false);
 		txtrOpenShredderIs.setLineWrap(true);
 		txtrOpenShredderIs.setBounds(12, 94, 402, 173);

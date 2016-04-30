@@ -5,5 +5,5 @@ package com.codepark.openshredder.shred;
  */
 public interface IShred {
 	public void Shred(ShredObserver sho);
- 
+
 }

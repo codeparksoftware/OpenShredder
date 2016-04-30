@@ -19,9 +19,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DropMode;
@@ -43,8 +46,6 @@ import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
 
-import org.apache.log4j.Logger;
-
 import com.codepark.openshredder.common.MessageBox;
 import com.codepark.openshredder.common.Strings;
 import com.codepark.openshredder.help.About;
@@ -56,7 +57,7 @@ import com.codepark.openshredder.shred.WipeMethod;
 
 public class MainForm extends JFrame {
 
-	private static final Logger logger = Logger.getLogger(MainForm.class);
+	private static final Logger logger = Logger.getLogger(MainForm.class.getName());
 	private WipeMethod metod = WipeMethod.DoD;
 	private JButton btnDosyaEkle, btnKlasorEkle, btnRemoveFile, btnRemoveAll, btnStart, btnPart, btnDisk;
 	private JTable table;
@@ -135,7 +136,7 @@ public class MainForm extends JFrame {
 						fileList = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
 
 					} catch (IOException | UnsupportedFlavorException e) {
-						logger.debug(e.getMessage(), e);
+						logger.severe(e.getMessage());
 						return;
 					}
 					for (int i = 0; i < fileList.size(); i++) {
@@ -294,19 +295,23 @@ public class MainForm extends JFrame {
 		itmCheckUpdate.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String oldFile = JarUtil.getExecutablePath();
-				JarAttributes jar = new JarAttributes(JarUtil.makeJarURLforLocal(oldFile));
-				String remoteFile = jar.getUpdatePath();
-				CheckVersion frm = new CheckVersion(oldFile, remoteFile);
-
-				Dialog d = new Dialog();
-				d.createDialog((Component) frm, "OpenShredder update", ((BaseProgressPanel) frm).getDimension());
-
-			}
-
+				checkUpdate();
+			}	
 		});
 	}
-
+	private void checkUpdate() {
+		String oldFile = JarUtil.getExecutablePath();
+		JarAttributes jar = new JarAttributes(JarUtil.makeJarURLforLocal(oldFile));
+		String remoteFile = jar.getUpdatePath();
+		CheckVersion frm = null;
+		try {
+			frm = new CheckVersion(oldFile, remoteFile);
+			Dialog d = new Dialog();
+			d.createDialog((Component) frm, "OpenShredder update", ((BaseProgressPanel) frm).getDimension());
+		} catch (FileNotFoundException e1) {
+			logger.severe(e1.getMessage());
+		}
+	}
 	private void addFile() {
 		JFileChooser jfc = new JFileChooser();
 		jfc.setCurrentDirectory(new File("."));
@@ -527,7 +532,7 @@ public class MainForm extends JFrame {
 					}
 				}
 			} else {
-				logger.error(text);
+				logger.log(Level.SEVERE, text);
 
 			}
 		}

@@ -1,11 +1,14 @@
 package com.codepark.openshredder.help;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
-
-import org.apache.log4j.Logger;
 
 import com.codepark.openshredder.common.DialogResult;
 import com.codepark.openshredder.common.MessageBox;
@@ -26,9 +29,13 @@ public class CheckVersion extends BaseProgressPanel {
 	public static final String CHECK_VERSION = "Checking version";
 	public static final String MSG_VERSION_NOT_FOUND = "New version not found!";
 
-	private static final Logger logger = Logger.getLogger(CheckVersion.class);
+	private static final Logger logger = Logger.getLogger(CheckVersion.class.getName());
 
-	public CheckVersion(String local, String remote) {
+	public CheckVersion(String local, String remote) throws FileNotFoundException {
+		if (local == null || local.trim().isEmpty())
+			throw new FileNotFoundException();
+		if (remote == null || remote.trim().isEmpty())
+			throw new FileNotFoundException();
 		setLocalFile(local);
 		setRemoteFile(remote);
 		initializeTask();
@@ -47,6 +54,7 @@ public class CheckVersion extends BaseProgressPanel {
 	@Override
 	public void work() {
 		setLabel(CHECK_VERSION);
+		logger.info(CHECK_VERSION);
 		newVersionFound = isNewVersionFound();
 		if (newVersionFound == true) {
 
@@ -56,11 +64,11 @@ public class CheckVersion extends BaseProgressPanel {
 
 			}
 			finished();
-	
+
 		} else {
 			finished();
 			MessageBox.showMessage(MSG_VERSION_NOT_FOUND);
-		
+
 		}
 
 	}
@@ -100,13 +108,27 @@ public class CheckVersion extends BaseProgressPanel {
 		super.finished();
 	}
 
+	public boolean isConnected() {
+
+		try {
+			final URL url = new URL("https://www.github.com");
+			final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.connect();
+			return true;
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+
+			return false;
+		}
+	}
+
 	class CheckInternetTask extends SwingWorker<Boolean, Void> {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
 			logger.info(CHECK_CONNECTION);
 			setLabel(CHECK_CONNECTION);
-			return SystemUtil.isConnected();
+			return isConnected();
 
 		}
 
@@ -118,16 +140,17 @@ public class CheckVersion extends BaseProgressPanel {
 				connected = get();
 				if (!connected) {
 					CheckVersion.this.setVisible(false);
+					finished();
 					MessageBox.showMessage(FAIL_CONNECTION_MSG, CHECK_CONNECTION, 3000);
 					logger.info(FAIL_CONNECTION_MSG);
-					System.exit(0);
+
 				} else {
 					start();
 				}
 
 			} catch (ExecutionException | InterruptedException e) {
 
-				logger.debug(e.getMessage(), e);
+				logger.log(Level.SEVERE, e.getMessage(), e);
 			}
 
 		}
@@ -144,11 +167,12 @@ public class CheckVersion extends BaseProgressPanel {
 			url = JarUtil.makeJarURLforRemote(remoteFile);
 			jar = new JarAttributes(url);
 			String newJarVersion = jar.getVersion();
+			System.out.println(newJarVersion + "<-->" + oldJarVersion);
 			logger.info(newJarVersion + "<-->" + oldJarVersion);
 			return newJarVersion.compareTo(oldJarVersion) > 0;
 		} catch (Exception e) {
 
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 			return false;
 		}
 	}

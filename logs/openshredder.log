@@ -1,4 +1,0 @@
-INFO  - 2016-04-27 17:50:42.263; com.codepark.openshredder.help.CheckVersion$CheckInternetTask; Checking connection
-INFO  - 2016-04-27 17:50:44.854; com.codepark.openshredder.help.CheckVersion; 0.0.3<-->null
-INFO  - 2016-04-27 17:50:44.855; com.codepark.openshredder.ui.BaseProgressPanel; Shredding operation finished!
-INFO  - 2016-04-27 17:50:51.441; com.codepark.openshredder.ui.BaseProgressPanel; Shredding operation finished!

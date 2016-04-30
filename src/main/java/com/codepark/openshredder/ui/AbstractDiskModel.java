@@ -32,11 +32,11 @@ public class AbstractDiskModel extends AbstractTableModel {
 	}
 
 	@Override
-//	public Class getColumnClass(int column) {
-//		if (column == 0)
-//			return ImageIcon.class;
-//		return Object.class;
-//	}
+	// public Class getColumnClass(int column) {
+	// if (column == 0)
+	// return ImageIcon.class;
+	// return Object.class;
+	// }
 
 	public void setValueAt(Object value, int row, int column) {
 		DiskModel dm = (DiskModel) dataVector.get(row);

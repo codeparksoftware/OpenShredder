@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -22,8 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-
-import org.apache.log4j.Logger;
 
 import com.codepark.openshredder.common.Strings;
 import com.codepark.openshredder.jarinfo.JarAttributes;
@@ -38,7 +38,7 @@ public class About extends JFrame {
 	/**
 	 * @throws HeadlessException
 	 */
-	private static final Logger logger = Logger.getLogger(About.class);
+	private static final Logger logger = Logger.getLogger(About.class.getName());
 	private JLabel lblAppName;
 	private JLabel lblV;
 	private JLabel lblGplV;
@@ -61,7 +61,7 @@ public class About extends JFrame {
 		try {
 			jar = new JarAttributes(new URL("jar:file:" + JarUtil.getExecutablePath() + "!/"));
 		} catch (MalformedURLException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 
 		setAppName();

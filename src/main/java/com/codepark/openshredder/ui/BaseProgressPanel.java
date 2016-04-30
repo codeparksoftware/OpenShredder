@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,8 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-
-import org.apache.log4j.Logger;
 
 import com.codepark.openshredder.shred.ShredObserver;
 
@@ -36,7 +36,7 @@ public abstract class BaseProgressPanel extends JPanel implements IProgress, Shr
 	protected Object MUTEX;
 	protected List<Long> tList;
 
-	private static final Logger logger = Logger.getLogger(BaseProgressPanel.class);
+	private static final Logger logger = Logger.getLogger(BaseProgressPanel.class.getName());
 
 	public BaseProgressPanel() {
 		setContentUI();
@@ -125,7 +125,7 @@ public abstract class BaseProgressPanel extends JPanel implements IProgress, Shr
 			this.finalize();
 		} catch (Throwable e) {
 
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 

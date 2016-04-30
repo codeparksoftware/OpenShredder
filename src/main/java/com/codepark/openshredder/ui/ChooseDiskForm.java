@@ -10,14 +10,14 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-
-import org.apache.log4j.Logger;
 
 import com.codepark.openshredder.help.CheckVersion;
 import com.codepark.openshredder.system.FileInfo;
@@ -26,7 +26,7 @@ import com.codepark.openshredder.system.SystemUtil;
 
 public class ChooseDiskForm extends JPanel {
 	public static final String[] columnNames = { "Type", "Label", "Storage", "Size", "Path", "Mount Point" };
-	private static final Logger logger = Logger.getLogger(CheckVersion.class);
+	private static final Logger logger = Logger.getLogger(ChooseDiskForm.class.getName());
 
 	public ChooseDiskForm(boolean mountPointOnly) {
 		setLayout(new BorderLayout(0, 0));
@@ -55,7 +55,7 @@ public class ChooseDiskForm extends JPanel {
 			try {
 				lstSize.add(String.valueOf(store.getTotalSpace()));
 			} catch (IOException e) {
-				logger.debug(e.getMessage(), e);
+				logger.log(Level.SEVERE, e.getMessage(), e);
 			}
 			lst.add(store.name());
 
@@ -114,7 +114,7 @@ public class ChooseDiskForm extends JPanel {
 						Window window = SwingUtilities.getWindowAncestor(ChooseDiskForm.this);
 						window.setVisible(false);
 					} catch (Throwable e1) {
-						logger.debug(e1.getMessage(), e1);
+						logger.log(Level.SEVERE, e1.getMessage(), e1);
 					}
 				}
 			}

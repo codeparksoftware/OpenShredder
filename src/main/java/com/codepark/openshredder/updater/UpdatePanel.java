@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.codepark.openshredder.common.MessageBox;
 import com.codepark.openshredder.jarinfo.JarUtil;
@@ -16,7 +16,7 @@ import com.codepark.openshredder.ui.BaseProgressPanel;
 public class UpdatePanel extends BaseProgressPanel {
 
 	boolean canceled = false;
-	private static final Logger logger = Logger.getLogger(UpdatePanel.class);
+	private static final Logger logger = Logger.getLogger(UpdatePanel.class.getName());
 	public final String[] args;
 	private String tmp = null;
 
@@ -52,12 +52,28 @@ public class UpdatePanel extends BaseProgressPanel {
 		fil.start();
 	}
 
+	public boolean deleteOldFile(String oldFile) {
+		File old = new File(oldFile);
+		int count = 0;
+		while (old.delete() != true && count < 1000) {//
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				logger.log(Level.SEVERE, e.getMessage(), e);
+			}
+			count++;
+			if (count == 1000)
+				return false;
+		}
+		return true;
+	}
+
 	public void finished() {
 
 		try {
 			File tmpFile = new File(tmp);
 			File runFile = new File(args[0]);
-			if (Files.deleteIfExists(runFile.toPath())) {
+			if (deleteOldFile(runFile.getAbsolutePath())) {
 				Files.copy(tmpFile.toPath(), runFile.toPath());
 				JarUtil.runJarFile(runFile.getAbsolutePath(), null);
 				this.setVisible(false);
@@ -68,7 +84,7 @@ public class UpdatePanel extends BaseProgressPanel {
 			}
 		} catch (IOException e) {
 
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 		super.finished();
 

@@ -4,18 +4,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
+import com.codepark.openshredder.common.Strings;
 
 public class SystemUtil {
 	private SystemUtil() {
 	}
 
-	private static final Logger logger = Logger.getLogger(SystemUtil.class);
+	private static final Logger logger = Logger.getLogger(SystemUtil.class.getName());
 
 	public static void setProxy(boolean val) {
 		System.setProperty("java.net.useSystemProxies", String.valueOf(val));
@@ -28,20 +28,6 @@ public class SystemUtil {
 		return tmpDir;
 	}
 
-	public static boolean isConnected() {
-
-		try {
-			final URL url = new URL("https://www.github.com");
-			final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.connect();
-			return true;
-		} catch (IOException e) {
-			logger.debug(e.getMessage());
-
-			return false;
-		}
-	}
-
 	public static <T> List<T> GetExec(String param) {
 
 		Runtime runtime = Runtime.getRuntime();
@@ -49,7 +35,7 @@ public class SystemUtil {
 		try {
 			process = runtime.exec(param);
 		} catch (IOException e) {
-			logger.debug(e.getMessage());
+			logger.log(Level.SEVERE, Strings.ERROR_CODE + ":3180" + e.getMessage(), e);
 		}
 		InputStream is = process.getInputStream();
 		InputStreamReader isr = new InputStreamReader(is);
@@ -64,7 +50,7 @@ public class SystemUtil {
 				lst.add(line);
 			}
 		} catch (IOException e) {
-		logger.debug(e.getMessage());
+			logger.log(Level.SEVERE, Strings.ERROR_CODE + ":3181" + e.getMessage(), e);
 		}
 		return (List<T>) lst;
 	}

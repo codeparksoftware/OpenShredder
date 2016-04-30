@@ -22,8 +22,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Random;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.codepark.openshredder.system.OSDetector;
 import com.codepark.openshredder.system.SystemUtil;
@@ -33,7 +33,7 @@ public class MetaData extends Job {
 	File file;
 	Random rand;
 
-	private static final Logger logger = Logger.getLogger(MetaData.class);
+	private static final Logger logger = Logger.getLogger(MetaData.class.getName());
 
 	public MetaData(File f) {
 
@@ -74,7 +74,7 @@ public class MetaData extends Job {
 		try {
 			path = Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 
 		return path.toString();
@@ -90,7 +90,7 @@ public class MetaData extends Job {
 			FileTime fileTime = FileTime.fromMillis(rand.nextLong());
 			Files.setLastModifiedTime(file.toPath(), fileTime);
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class MetaData extends Job {
 			/* Change Created Time Stamp */
 			Files.setAttribute(this.file.toPath(), "lastAccessTime", fileTime);
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
@@ -112,7 +112,7 @@ public class MetaData extends Job {
 			/* Change Created Time Stamp */
 			Files.setAttribute(file.toPath(), "basic:creationTime", fileTime, NOFOLLOW_LINKS);
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 

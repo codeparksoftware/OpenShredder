@@ -19,12 +19,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Body extends Job {
 
-	private static final Logger logger = Logger.getLogger(Body.class);
+	private static final Logger logger = Logger.getLogger(Body.class.getName());
 	private File f;
 	private short id;
 	private short BYTE_BUFFER = 16384;
@@ -42,7 +42,7 @@ public class Body extends Job {
 			rand.setLength(0);
 			rand.close();
 		} catch (IOException e) {
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 
 	}
@@ -77,14 +77,14 @@ public class Body extends Job {
 			percent(call, fsize);
 		} catch (IOException e) {
 			Thread.currentThread().interrupt();
-			logger.debug(e.getMessage(), e);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		} finally {
 			try {
 				removeThreadId(Thread.currentThread().getId());
 				ch.close();
 				out.close();
 			} catch (IOException e) {
-				logger.debug(e.getMessage(), e);
+				logger.log(Level.SEVERE, e.getMessage(), e);
 			}
 
 		}

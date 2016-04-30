@@ -2,13 +2,12 @@ package com.codepark.openshredder.types;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import com.codepark.openshredder.exceptions.NotFolderException;
 
 public class Folder {
-	private static final Logger logger = Logger.getLogger(Folder.class);
+	private static final Logger logger = Logger.getLogger(Folder.class.getName());
 	private final File folder;
 
 	public Folder(String path) throws FileNotFoundException, NotFolderException {

@@ -1,6 +1,7 @@
 package com.codepark.openshredder.shred;
 
 import java.io.File;
+
 /*
 *This class extends ShredFileStore class.
 *this class used to clear file storage with different values multiple times .
@@ -19,9 +20,9 @@ public class ShredFileStoreDod extends ShredFileStore {
 		for (int i = 1; i < 4; i++) {
 			bd = new Body(f, (short) i);
 			bd.add(sho);
- 
+
 			bd.start();// Wiping body
-		 
+
 			m.start();
 		}
 

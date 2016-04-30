@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.codepark.openshredder.common.Strings;
 import com.codepark.openshredder.system.FileInfo;
@@ -22,8 +22,7 @@ import com.codepark.openshredder.system.FileInfo;
 public class ShredFreeSpace implements IShred {
 	private final long MAX_LIMITS;
 	protected File f;
-	private static final Logger logger = Logger.getLogger(ShredFreeSpace.class);
-	
+	private static final Logger logger = Logger.getLogger(ShredFreeSpace.class.getName());
 
 	public ShredFreeSpace(File mountPoint) {
 		this.f = mountPoint;
@@ -40,7 +39,8 @@ public class ShredFreeSpace implements IShred {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			logger.debug(Strings.ERROR_CODE+":2180"+e.getMessage(), e);
+			logger.log(Level.SEVERE, Strings.ERROR_CODE + ":2180" + e.getMessage(), e);
+
 		}
 		return file;
 	}
@@ -101,7 +101,7 @@ public class ShredFreeSpace implements IShred {
 			return lst;
 
 		} catch (IOException e) {
-			logger.debug(Strings.ERROR_CODE+":2182" + e.getMessage(), e);
+			logger.log(Level.SEVERE, Strings.ERROR_CODE + ":2182" + e.getMessage(), e);
 		}
 		return lst;
 	}
