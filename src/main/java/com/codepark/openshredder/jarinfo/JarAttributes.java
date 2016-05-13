@@ -6,8 +6,10 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
+ 
 
 public class JarAttributes {
 	private Manifest manifest;
@@ -36,7 +38,7 @@ public class JarAttributes {
 			setUpdatePath(getInfo("Update-Path"));
 			jarFile.close();
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 		}
 
 	}

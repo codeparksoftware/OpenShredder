@@ -1,30 +1,18 @@
 package com.codepark.openshredder.shred;
 
-/*
-Author Selami
- 25.03.2016
-This class used to clean metadata of files such as last accestime,crationtime etc.This information
-separately keeps from file content.This information used to find info about file in digital forensic analyses and criminal 
-observation.a true secure deletion must provide to clear this metadata tags.
-Therefore this file information must be cleaned.and
-Also this class has ShredObservable implements.Then it must send process completion info as percent value.
-Also sends thread id information to interrupt thread from GUI.
-SetFlag is secure deletion mark and it is valid for unix system.
-Name clear function is not implemented yet.
-*/
-import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 import com.codepark.openshredder.system.OSDetector;
 import com.codepark.openshredder.system.SystemUtil;
 
@@ -74,7 +62,7 @@ public class MetaData extends Job {
 		try {
 			path = Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 		}
 
 		return path.toString();
@@ -87,33 +75,41 @@ public class MetaData extends Job {
 	private void SetLastModifiedTime() {
 
 		try {
-			FileTime fileTime = FileTime.fromMillis(rand.nextLong());
+			String date = "01.01.1990 00:00:00";
+			long milis = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").parse(date).getTime();
+			FileTime fileTime = FileTime.fromMillis(milis);
 			Files.setLastModifiedTime(file.toPath(), fileTime);
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+		} catch (IOException | ParseException e) {
+
+			logger.log(Level.Error, e.getMessage());
 		}
 	}
 
 	private void SetLastAccessedTime() {
 
 		try {
-			FileTime fileTime = FileTime.fromMillis(rand.nextLong());
+			String date = "01.01.1990 00:00:00";
+			long milis = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").parse(date).getTime();
+			FileTime fileTime = FileTime.fromMillis(milis);
 			/* Change Created Time Stamp */
 			Files.setAttribute(this.file.toPath(), "lastAccessTime", fileTime);
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+		} catch (IOException | ParseException e) {
+			logger.log(Level.Error, e.getMessage());
 		}
 	}
 
 	private void SetCreationTime() {
 
 		try {
-			FileTime fileTime = FileTime.fromMillis(rand.nextLong());
+			String date = "01.01.1990 00:00:00";
+			long milis = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").parse(date).getTime();
+			FileTime fileTime = FileTime.fromMillis(milis);
 			/* Change Created Time Stamp */
-			Files.setAttribute(file.toPath(), "basic:creationTime", fileTime, NOFOLLOW_LINKS);
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			Files.setAttribute(this.file.toPath(), "creationTime", fileTime);
+		} catch (IOException | ParseException e) {
+			logger.log(Level.Error, e.getMessage());
 		}
+
 	}
 
 }

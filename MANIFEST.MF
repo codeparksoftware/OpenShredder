@@ -4,13 +4,13 @@ Main-Class: com.codepark.openshredder.ui.Program
 Class-Path: .
 Name: OpenShredder
 Specification-Title: Open File Shredder
-Specification-Version: 0.0.2
+Specification-Version: 0.0.3
 Specification-Vendor: CodePark
 Licence: GPL v3
 Update-Path: https://raw.githubusercontent.com/codeparksoftware/OpenShredder/master/Shredder.jar
 Built-By: Selami
 Build-Jdk: 1.8.0_66
 Implementation-Title: Open File Shredder
-Implementation-Version: 0.0.2
+Implementation-Version: 0.0.3
 Implementation-Vendor-Id: com.codepark.openshredder
 Implementation-Vendor: CodePark

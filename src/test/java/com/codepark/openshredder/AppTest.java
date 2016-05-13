@@ -1,9 +1,8 @@
 package com.codepark.openshredder;
 
-import java.io.FileNotFoundException;
-
-import com.codepark.openshredder.exceptions.NotRegularFileException;
-import com.codepark.openshredder.types.RegularFile;
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
+import com.codepark.openshredder.shred.ShredObserver;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -12,7 +11,7 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class AppTest extends TestCase {
+public class AppTest extends TestCase implements ShredObserver {
 	/**
 	 * Create the test case
 	 *
@@ -35,25 +34,26 @@ public class AppTest extends TestCase {
 	 * Rigourous Test :-)
 	 */
 	public void testApp() {
-		try {
-			RegularFile reg = null, reg1 = null;
-			try {
-				reg1 = new RegularFile("C:\\Users\\ab170460\\Desktop\\ar-ge.docx");
 
-				reg = new RegularFile("C:\\Users\\ab170460\\Desktop\\Updater.jar");
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.out.println(reg.toString());
-			System.out.println(reg1.toString());
-			System.out.println(reg1.equals(reg));
-			System.out.println(reg.hashCode());
-			System.out.println(reg1.hashCode());
-		} catch (NotRegularFileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		System.out.println(new Date().toLocaleString());
+		Logger.getLogger(AppTest.class.getName()).log(Level.Info, "selamlar");
+	}
+
+	@Override
+	public void update(int value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addThreadId(long val) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeThreadId(long val) {
+		// TODO Auto-generated method stub
 
 	}
 }

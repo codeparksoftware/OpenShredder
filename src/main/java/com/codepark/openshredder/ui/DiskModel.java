@@ -1,63 +1,31 @@
 package com.codepark.openshredder.ui;
 
-public class DiskModel {
-	public DiskModel(String[] f) {
+import com.codepark.openshredder.types.StorageType;
 
-		setType(f[0]);
-		setLabel(f[1]);
-		setdeviceName(f[2]);
-		setSize(f[3]);
-		setPath(f[4]);
-		setMountPoint(f[5]);
-		if (f[2].equals("part"))
-			setdeviceName("    " + f[2]);
+public class DiskModel {
+	public DiskModel(StorageType storage) {
+
+	 
+		setSize(storage.getSize());
+		setPath(storage.getStoreName());
+		setMountPoint(storage.getMountPoint());
 
 	}
 
-	private static final short TYPE_INDEX = 0;
-	private static final short LABEL_INDEX = 1;
-	private static final short DEVICE_INDEX = 2;
-	private static final short SIZE_INDEX = 3;
-	private static final short PATH_INDEX = 4;
-	private static final short MOUNT_POINT = 5;
+	private static final short PATH_INDEX = 0;
+	private static final short SIZE_INDEX = 1;
+	private static final short MOUNT_POINT = 2;
 
-	private String type;
-	private String label;
-	private String deviceName;
-	private String Size;
+	private long size;
 	private String path;
 	private String mountPoint;
 
-	private String getType() {
-		return type;
+	public long getSize() {
+		return size;
 	}
 
-	private void setType(String type) {
-		this.type = type;
-	}
-
-	private String getLabel() {
-		return label;
-	}
-
-	private void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getdeviceName() {
-		return deviceName;
-	}
-
-	public void setdeviceName(String deviceName) {
-		this.deviceName = deviceName;
-	}
-
-	public String getSize() {
-		return Size;
-	}
-
-	private void setSize(String size) {
-		Size = size;
+	private void setSize(long size) {
+		this.size = size;
 	}
 
 	public String getPath() {
@@ -78,12 +46,7 @@ public class DiskModel {
 
 	public Object GetValue(int colIndex) {
 		switch (colIndex) {
-		case TYPE_INDEX:
-			return getType();
-		case LABEL_INDEX:
-			return getLabel();
-		case DEVICE_INDEX:
-			return getdeviceName();
+
 		case SIZE_INDEX:
 			return getSize();
 		case PATH_INDEX:
@@ -98,14 +61,9 @@ public class DiskModel {
 
 	public void setValue(Object value, int colIndex) {
 		switch (colIndex) {
-		case TYPE_INDEX:
-			setType((String) value);
-		case LABEL_INDEX:
-			setLabel((String) value);
-		case DEVICE_INDEX:
-			setdeviceName((String) value);
+
 		case SIZE_INDEX:
-			setSize((String) value);
+			setSize((long) value);
 		case PATH_INDEX:
 			setPath((String) value);
 		case MOUNT_POINT:

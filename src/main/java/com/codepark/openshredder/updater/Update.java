@@ -1,18 +1,17 @@
 package com.codepark.openshredder.updater;
 
-import java.awt.Component;
 import java.io.File;
 import java.nio.file.Files;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 import com.codepark.openshredder.common.MessageBox;
 import com.codepark.openshredder.system.SystemUtil;
 import com.codepark.openshredder.ui.BaseProgressPanel;
 import com.codepark.openshredder.ui.Dialog;
-import com.codepark.openshredder.ui.Program;
 import com.codepark.openshredder.ui.UIFactory;
 
 public class Update {
@@ -23,28 +22,30 @@ public class Update {
 	private static final Logger logger = Logger.getLogger(Update.class.getName());
 
 	public static void main(String[] args) {
+
 		checkMethod(args);
 		// BasicConfigurator.configure();
 		java.awt.EventQueue.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
+
 				SystemUtil.setProxy(true);
 				try {
 					UIManager.setLookAndFeel(new UIFactory().getDefaultUI());
 				} catch (ClassNotFoundException e) {
-					logger.log(Level.SEVERE, e.getMessage(), e);
+					logger.log(Level.Error, e.getMessage());
 				} catch (InstantiationException e) {
-					logger.log(Level.SEVERE, e.getMessage(), e);
+					logger.log(Level.Error, e.getMessage());
 				} catch (IllegalAccessException e) {
-					logger.log(Level.SEVERE, e.getMessage(), e);
+					logger.log(Level.Error, e.getMessage());
 				} catch (UnsupportedLookAndFeelException e) {
-					logger.log(Level.SEVERE, e.getMessage(), e);
+					logger.log(Level.Error, e.getMessage());
 				}
 
 				UpdatePanel frm = new UpdatePanel(args);
 				Dialog d = new Dialog();
-				d.createDialog((Component) frm, args[2] + " update", ((BaseProgressPanel) frm).getDimension());
+				d.createDialog(frm, args[2] + " update", ((BaseProgressPanel) frm).getDimension());
 
 			}
 
@@ -52,6 +53,11 @@ public class Update {
 
 	}
 
+	/**
+	 * checks argument are valid and correct.
+	 * 
+	 * @param args
+	 */
 	private static void checkMethod(String[] args) {
 		if (args.length != 3) {
 			MessageBox.showMessage(

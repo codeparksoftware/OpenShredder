@@ -6,9 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 import com.codepark.openshredder.common.Strings;
 
 public class SystemUtil {
@@ -35,7 +35,7 @@ public class SystemUtil {
 		try {
 			process = runtime.exec(param);
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, Strings.ERROR_CODE + ":3180" + e.getMessage(), e);
+			logger.log(Level.Error, Strings.ERROR_CODE + ":3180" + e.getMessage());
 		}
 		InputStream is = process.getInputStream();
 		InputStreamReader isr = new InputStreamReader(is);
@@ -50,7 +50,7 @@ public class SystemUtil {
 				lst.add(line);
 			}
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, Strings.ERROR_CODE + ":3181" + e.getMessage(), e);
+			logger.log(Level.Error, Strings.ERROR_CODE + ":3181" + e.getMessage());
 		}
 		return (List<T>) lst;
 	}

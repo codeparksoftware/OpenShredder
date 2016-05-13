@@ -1,47 +1,26 @@
 package com.codepark.openshredder.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
+import com.codepark.openshredder.types.FileType;
+import com.codepark.openshredder.types.IFile;
+import com.codepark.openshredder.types.WipeMethod;
+
 public class FileModel {
 
-	private static final Logger logger = Logger.getLogger(FileModel.class.getName());
+	public FileModel(IFile f) {
 
-	public FileModel(File f) {
-
-		setFileName(f.getAbsolutePath());
-
-		FileType ftype = new FileTypeFactory().GetFileType(f);
+		setFileName(f.getPath());
+		FileType ftype = f.getType();
 		setType(ftype);
-		setImg(new ImageFactory().IconType(ftype));
-		try {
-			setSize(CalcSize(f));
-			setCreatedTime((FileTime) Files.getAttribute(f.toPath(), "creationTime"));
-			setLastModified((FileTime) Files.getAttribute(f.toPath(), "lastModifiedTime"));
-			setLastAccess((FileTime) Files.getAttribute(f.toPath(), "lastAccessTime"));
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-		}
-
-	}
-
-	private long CalcSize(File f) {
-		try {
-			if (f.isDirectory() || f.isFile())
-				return f.length();
-			return new RandomAccessFile(f, "r").length();
-
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-		}
-		return 0;
+		setImg(ImageFactory.IconType(ftype));
+		setSize(f.getLength());
+		setCreatedTime(f.getCreatedTime());
+		setLastModified(f.getLastModifiedTime());
+		setLastAccess(f.getLastAccessTime());
+		setWipeMethod(f.getWipeMethod());
 	}
 
 	private static final short IMAGE_INDEX = 0;
@@ -51,6 +30,7 @@ public class FileModel {
 	private static final int CREATED_INDEX = 4;
 	private static final int LASTACCES_INDEX = 5;
 	private static final int LASTMODIFIED_INDEX = 6;
+	private static final int SHRED_ALGORITHM_INDEX = 7;
 
 	private ImageIcon img;
 	private String fileName;
@@ -59,6 +39,7 @@ public class FileModel {
 	private FileTime lastModified;
 	private FileTime lastAccess;
 	private FileTime createdTime;
+	private WipeMethod method;
 
 	public String getFileName() {
 		return fileName;
@@ -129,6 +110,8 @@ public class FileModel {
 			return getCreatedTime();
 		case IMAGE_INDEX:
 			return getImg();
+		case SHRED_ALGORITHM_INDEX:
+			return getWipeMethod();
 		default:
 			return new Object();
 		}
@@ -150,6 +133,8 @@ public class FileModel {
 			setCreatedTime((FileTime) value);
 		case IMAGE_INDEX:
 			setImg((ImageIcon) value);
+		case SHRED_ALGORITHM_INDEX:
+			setWipeMethod((WipeMethod) value);
 		default:
 			System.out.println("No such column   in here!...");
 		}
@@ -161,6 +146,14 @@ public class FileModel {
 
 	private void setImg(ImageIcon img) {
 		this.img = img;
+	}
+
+	public WipeMethod getWipeMethod() {
+		return method;
+	}
+
+	private void setWipeMethod(WipeMethod method) {
+		this.method = method;
 	}
 
 }

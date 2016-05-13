@@ -8,8 +8,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -19,6 +17,8 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 import com.codepark.openshredder.shred.ShredObserver;
 
 /**
@@ -113,7 +113,7 @@ public abstract class BaseProgressPanel extends JPanel implements IProgress, Shr
 	}
 
 	public void finished() {
-		logger.info("Operation finished!");
+		logger.log(Level.Info,"Operation finished!");
 		System.out.println("Operation finished!...");
 		setFinished(true);
 		this.btnStop.setEnabled(false);
@@ -125,7 +125,7 @@ public abstract class BaseProgressPanel extends JPanel implements IProgress, Shr
 			this.finalize();
 		} catch (Throwable e) {
 
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 		}
 	}
 
@@ -154,7 +154,8 @@ public abstract class BaseProgressPanel extends JPanel implements IProgress, Shr
 	}
 
 	public void stop() {
-		worker.cancel(true);
+		if (worker != null)
+			worker.cancel(true);
 		Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
 		// Iterate over set to find current running
 		for (Thread thread : setOfThread) {
@@ -168,8 +169,8 @@ public abstract class BaseProgressPanel extends JPanel implements IProgress, Shr
 	}
 
 	@Override
-	public void update(int i) {
-		setProgress(pBarCurrent, i);
+	public void update(int value) {
+		setProgress(pBarCurrent, value);
 	}
 
 	public void add(Long o) {
@@ -190,13 +191,13 @@ public abstract class BaseProgressPanel extends JPanel implements IProgress, Shr
 	@Override
 	public void addThreadId(long val) {
 		add(val);
-		System.out.println("added: " + val);
+		// System.out.println("added: " + val);
 	}
 
 	@Override
 	public void removeThreadId(long val) {
 		remove(val);
-		System.out.println("removed: " + val);
+		// System.out.println("removed: " + val);
 	}
 
 }

@@ -5,6 +5,7 @@ import static java.awt.event.ItemEvent.SELECTED;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -23,8 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DropMode;
@@ -44,8 +43,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.table.TableCellRenderer;
 
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 import com.codepark.openshredder.common.MessageBox;
 import com.codepark.openshredder.common.Strings;
 import com.codepark.openshredder.help.About;
@@ -53,17 +55,23 @@ import com.codepark.openshredder.help.AboutUs;
 import com.codepark.openshredder.help.CheckVersion;
 import com.codepark.openshredder.jarinfo.JarAttributes;
 import com.codepark.openshredder.jarinfo.JarUtil;
-import com.codepark.openshredder.shred.WipeMethod;
+import com.codepark.openshredder.types.EmptySpace;
+import com.codepark.openshredder.types.FileStorage;
+import com.codepark.openshredder.types.FileType;
+import com.codepark.openshredder.types.Folder;
+import com.codepark.openshredder.types.IFile;
+import com.codepark.openshredder.types.RegularFile;
+import com.codepark.openshredder.types.WipeMethod;
 
 public class MainForm extends JFrame {
 
 	private static final Logger logger = Logger.getLogger(MainForm.class.getName());
-	private WipeMethod metod = WipeMethod.DoD;
+	private WipeMethod method = WipeMethod.DoD;
 	private JButton btnDosyaEkle, btnKlasorEkle, btnRemoveFile, btnRemoveAll, btnStart, btnPart, btnDisk;
 	private JTable table;
 
 	public static final String[] columnNames = { "Icon", "File", "Size", "Type", "Last Modified Time",
-			"Last Accessed Time", "Created Time" };
+			"Last Accessed Time", "Created Time", "Algorithm" };
 	private static final String CONFIRM_REMOVE = "Are you sure want to remove  the folder and all its contents?";
 	private static final String ADD_FILE = "Add single file";
 
@@ -114,6 +122,7 @@ public class MainForm extends JFrame {
 		TableCellRenderer renderer = new EvenOddRenderer();
 		table.setDefaultRenderer(Object.class, renderer);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		table.setFont(new Font(table.getFont().getName(), Font.PLAIN, 11));
 		table.getColumnModel().getColumn(0).setMaxWidth(33);
 		table.getColumnModel().getColumn(1).setPreferredWidth((int) this.getWidth() / 2);
 		table.getColumnModel().getColumn(1).setMinWidth(250);
@@ -122,6 +131,8 @@ public class MainForm extends JFrame {
 		table.getColumnModel().getColumn(4).setPreferredWidth((int) this.getWidth() / 5);
 		table.getColumnModel().getColumn(5).setPreferredWidth((int) this.getWidth() / 5);
 		table.getColumnModel().getColumn(6).setPreferredWidth((int) this.getWidth() / 5);
+		table.getColumnModel().getColumn(7).setPreferredWidth((int) this.getWidth() / 15);
+
 		table.setDragEnabled(true);
 		table.setDropMode(DropMode.INSERT);
 
@@ -136,14 +147,18 @@ public class MainForm extends JFrame {
 						fileList = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
 
 					} catch (IOException | UnsupportedFlavorException e) {
-						logger.severe(e.getMessage());
+						logger.log(Level.Error,e.getMessage());
 						return;
 					}
 					for (int i = 0; i < fileList.size(); i++) {
 						if (((File) fileList.get(i)).isFile()) {
-							initializeData(((File) fileList.get(i)));
+							{
+								initializeRegularFile(((File) fileList.get(i)).getAbsolutePath());
+							}
 						} else if (((File) fileList.get(i)).isDirectory()) {
-							LoadListByPath(((File) fileList.get(i)).getAbsolutePath());
+							new Worker(((File) fileList.get(i)).getAbsolutePath()).execute();
+							// loadListByPath(((File)
+							// fileList.get(i)).getAbsolutePath());
 						}
 					}
 					// super.drop(dtde);throwing exception why?
@@ -208,9 +223,54 @@ public class MainForm extends JFrame {
 
 	}
 
-	private void initializeData(File f) {
+	private void initializeFolder(String path) {
+
+		IFile folder = null;
+		try {
+			folder = new Folder(path);
+			folder.setWipeMethod(this.method);
+			initializeObject(folder);
+		} catch (IOException e) {
+			logger.log(Level.Error, e.getMessage());
+		}
+	}
+
+	private void initializeRegularFile(String path) {
+		IFile regularFile = null;
+		try {
+			regularFile = new RegularFile(path);
+			regularFile.setWipeMethod(this.method);
+			initializeObject(regularFile);
+		} catch (IOException e) {
+			logger.log(Level.Error, e.getMessage());
+		}
+
+	}
+
+	private void initializeFileStorage(String path) {
+		IFile fileStorage = null;
+		try {
+			fileStorage = new FileStorage(path);
+			fileStorage.setWipeMethod(this.method);
+			initializeObject(fileStorage);
+		} catch (IOException e) {
+			logger.log(Level.Error, e.getMessage());
+		}
+	}
+
+	private void initializeEmptySpace(String path) {
+		IFile fileStorage = null;
+		try {
+			fileStorage = new EmptySpace(path);
+			initializeObject(fileStorage);
+		} catch (IOException e) {
+			logger.log(Level.Error, e.getMessage());
+		}
+	}
+
+	private void initializeObject(IFile f) {
 		for (int i = 0; i < table.getRowCount(); i++) {
-			if (table.getValueAt(i, 1).toString().equals(f.getAbsolutePath())) {
+			if (table.getValueAt(i, 1).toString().equals(f.getPath())) {
 				return;
 			}
 		}
@@ -241,9 +301,9 @@ public class MainForm extends JFrame {
 		rdbtnmnitmZeroPass.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (arg0.getStateChange() == ItemEvent.SELECTED) {
-					metod = WipeMethod.Zero;
+					method = WipeMethod.Zero;
 				} else
-					metod = WipeMethod.DoD;
+					method = WipeMethod.DoD;
 			}
 		});
 		menuEdit.add(rdbtnmnitmZeroPass);
@@ -252,9 +312,9 @@ public class MainForm extends JFrame {
 		rdbtnmnitmDodPass.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if (arg0.getStateChange() == SELECTED) {
-					metod = WipeMethod.DoD;
+					method = WipeMethod.DoD;
 				} else
-					metod = WipeMethod.Zero;
+					method = WipeMethod.Zero;
 			}
 		});
 
@@ -296,29 +356,34 @@ public class MainForm extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				checkUpdate();
-			}	
+			}
 		});
 	}
+
 	private void checkUpdate() {
 		String oldFile = JarUtil.getExecutablePath();
 		JarAttributes jar = new JarAttributes(JarUtil.makeJarURLforLocal(oldFile));
 		String remoteFile = jar.getUpdatePath();
+		logger.log(Level.Info,remoteFile);
+		logger.log(Level.Info, oldFile);
 		CheckVersion frm = null;
 		try {
 			frm = new CheckVersion(oldFile, remoteFile);
 			Dialog d = new Dialog();
-			d.createDialog((Component) frm, "OpenShredder update", ((BaseProgressPanel) frm).getDimension());
+			d.createDialog(frm, "OpenShredder update", ((BaseProgressPanel) frm).getDimension());
 		} catch (FileNotFoundException e1) {
-			logger.severe(e1.getMessage());
+			logger.log(Level.Error,e1.getMessage());
 		}
 	}
+
 	private void addFile() {
 		JFileChooser jfc = new JFileChooser();
 		jfc.setCurrentDirectory(new File("."));
 		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		int tut = jfc.showOpenDialog(MainForm.this);
 		if (tut == JFileChooser.APPROVE_OPTION) {
-			initializeData(jfc.getSelectedFile());
+			initializeRegularFile(jfc.getSelectedFile().getAbsolutePath());
+
 		}
 	}
 
@@ -328,7 +393,8 @@ public class MainForm extends JFrame {
 		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int tut = jfc.showOpenDialog(MainForm.this);
 		if (tut == JFileChooser.APPROVE_OPTION) {
-			LoadListByPath(jfc.getSelectedFile().getAbsolutePath());
+			new Worker(jfc.getSelectedFile().getAbsolutePath()).execute();
+			// loadListByPath(jfc.getSelectedFile().getAbsolutePath());
 
 		}
 	}
@@ -340,9 +406,9 @@ public class MainForm extends JFrame {
 			AbstractFileModel abs = (AbstractFileModel) table.getModel();
 			FileType type = (FileType) table.getValueAt(i, 3);// file_type //
 																// index
-			if (type == FileType.File)
+			if (type == FileType.RegularFile)
 				abs.DeleteRow(i);
-			else if (type == FileType.Directory) {
+			else if (type == FileType.Folder) {
 				int tut = JOptionPane.showConfirmDialog(MainForm.this, CONFIRM_REMOVE);
 				if (tut == JOptionPane.YES_OPTION) {
 
@@ -425,20 +491,23 @@ public class MainForm extends JFrame {
 		toolBar.add(btnRemoveAll);
 
 		toolBar.addSeparator();
-		btnStart = new JButton("Wipe");
+		btnStart = new JButton("Shred Files");
 		btnStart.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (table.getRowCount() == 0) {
-					MessageBox.showMessage("List is empty.\nPlease add file or directory to shred.");
+					MessageBox.showMessage("Shred list is empty.\nPlease add an object to shred.");
 					return;
 				}
-				List<String> lst = new ArrayList<String>();
+				List<IFile> lst = new ArrayList<IFile>();
 				for (int i = table.getRowCount() - 1; i >= 0; i--) {
-					lst.add((String) table.getValueAt(i, 1));
+
+					AbstractFileModel afm = (AbstractFileModel) table.getModel();
+					IFile file = afm.getDataRow(i);
+					lst.add(file);
 				}
-				ShredProgress prg = new ShredProgress(lst, metod, false);
+				ShredProgress prg = new ShredProgress(lst);
 				Dialog d = new Dialog();
 				d.createDialog((JComponent) e.getSource(), prg, "Shred File!...", prg.getDimension());
 				checkFileList();
@@ -458,49 +527,47 @@ public class MainForm extends JFrame {
 		btnPart.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				ChooseDiskForm frm = new ChooseDiskForm(true);
-				Dialog d = new Dialog();
-				d.createDialog((JComponent) e.getSource(), frm, "Choose File Storage ", new Dimension(450, 500));
-				if (frm.getSelectedmountPoint().trim() != "") {
-					String tmp = frm.getSelectedmountPoint();
-					List<String> lst = new ArrayList<>();
-					lst.add(tmp);
-					ShredProgress p = new ShredProgress(lst, metod, true);
-					d.createDialog((Component) e.getSource(), p, "Wipe Free Space (" + tmp + ")", p.getDimension());
-					if (p.isFinished() == true) {
-						MessageBox.showMessage(tmp + " wipe free space finished.");
-					}
-				}
+				addEmptySpace((JComponent) e.getSource());
 			}
+
 		});
 		btnPart.setToolTipText("Wipe Empty  space that mounted disks and partitions");
 		btnPart.setIcon(new ImageIcon(getClass().getResource("/com/codepark/openshredder/images/cleanup.png")));
-		toolBar.add(btnPart);
+		// toolBar.add(btnPart);
 
 		btnDisk = new JButton("Full Disk Wipe");
 		btnDisk.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent arg0) {
-				ChooseDiskForm frm = new ChooseDiskForm(false);
-				Dialog d = new Dialog();
-				d.createDialog((JComponent) arg0.getSource(), frm, "Choose Mounted Disk", new Dimension(450, 500));
-				if (frm.getPath().trim() != "") {
-					String tmp = frm.getPath();
-					List<String> lst = new ArrayList<>();
-					lst.add(tmp);
-					ShredProgress p = new ShredProgress(lst, metod, false);
-					d.createDialog((Component) arg0.getSource(), p, "Disk Wipe (" + tmp + ")", p.getDimension());
-					if (p.isFinished() == true) {
-						MessageBox.showMessage(tmp + " wipe finished");
-					}
-				}
+			public void actionPerformed(ActionEvent e) {
+				addFileStorage((JComponent) e.getSource());
 			}
+
 		});
 		btnDisk.setToolTipText("Secure clear  physical disk");
 		btnDisk.setIcon(new ImageIcon(
 				getClass().getResource("/com/codepark/openshredder/images/Apps-Drive-Harddisk-icon.png")));
-		toolBar.add(btnDisk);
+		// toolBar.add(btnDisk);
 
+	}
+
+	private void addFileStorage(JComponent comp) {
+		ChooseDiskForm frm = new ChooseDiskForm();
+		Dialog d = new Dialog();
+		d.createDialog(comp, frm, "Choose Mounted Disk", new Dimension(450, 500));
+		if (frm.getPath().trim() != "") {
+			String tmp = frm.getPath();
+			initializeFileStorage(tmp);
+		}
+	}
+
+	private void addEmptySpace(JComponent comp) {
+		ChooseDiskForm frm = new ChooseDiskForm();
+		Dialog d = new Dialog();
+		d.createDialog(comp, frm, "Choose File Storage ", new Dimension(450, 500));
+		if (frm.getSelectedmountPoint().trim() != "") {
+			String tmp = frm.getSelectedmountPoint();
+			initializeEmptySpace(tmp);
+		}
 	}
 
 	private void checkFileList() {
@@ -514,25 +581,25 @@ public class MainForm extends JFrame {
 
 	}
 
-	protected void LoadListByPath(String text) {
+	protected void loadListByPath(String path) {
 
-		File f = new File(text);
+		File f = new File(path);
 
-		if (f.exists() && f.isDirectory()) {
-			initializeData(f);
-
+		if (f.isDirectory() && f.exists()) {
+			initializeFolder(path);
+			//
 			File[] list = f.listFiles();
 			if (list != null) {
 				for (int i = 0; i < list.length; i++) {
-					if (list[i].isFile())
-						initializeData(list[i]);
-					else if (list[i].isDirectory()) {
+					if (list[i].isFile()) {
+						initializeRegularFile(list[i].getAbsolutePath());
+					} else if (list[i].isDirectory()) {
 
-						LoadListByPath(list[i].getAbsolutePath());
+						loadListByPath(list[i].getAbsolutePath());
 					}
 				}
 			} else {
-				logger.log(Level.SEVERE, text);
+				logger.log(Level.Error, path);
 
 			}
 		}
@@ -563,4 +630,28 @@ public class MainForm extends JFrame {
 			}
 		});
 	}
+
+	class Worker extends SwingWorker<Void, Void> {
+
+		String root;
+
+		public Worker(String root) {
+			this.root = root;
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			loadListByPath(root);
+			return null;
+
+		}
+
+		@Override
+		protected void done() {
+
+			super.done();
+		}
+
+	}
+
 }

@@ -7,7 +7,7 @@ package com.codepark.openshredder.shred;
  *         work progress state
  */
 public interface ShredObserver {
-	public void update(int i);
+	public void update(int value);
 
 	public void addThreadId(long val);
 

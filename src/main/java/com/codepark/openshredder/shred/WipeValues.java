@@ -13,11 +13,11 @@ import java.security.SecureRandom;
 
 public class WipeValues {
 	private int Length;
-	private int id;
+	private Object val;
 
-	public WipeValues(int len, short id) {
+	public WipeValues(int len, Object val) {
 		this.Length = len;
-		this.id = id;
+		this.val = val;
 
 	}
 
@@ -26,19 +26,15 @@ public class WipeValues {
 	}
 
 	public ByteBuffer GenerateValue() {
-		if (id == 0)
-			return SetRawBuf(Length, ZERO);
-		if (id == 1)
-			return SetRawBuf(Length, PASS1);
-		if (id == 2)
-			return SetRawBuf(Length, PASS2);
-		else if (id == 3)
+		if (this.val.getClass().getTypeName() == SecureRandom.class.getTypeName())
 			return SetRawBuf(Length);
-		return null;
+
+		else
+			return SetRawBuf(Length, (byte) val);
 
 	}
 
-	public static byte ZERO = (0x00), PASS1 = (0X55), PASS2 = (byte) (0XAA);
+	public static byte ZERO = (0x00), PASS1 = (byte) (0X55), PASS2 = (byte) (0XAA);
 
 	private ByteBuffer SetRawBuf(int len, byte val) {
 		ByteBuffer b = ByteBuffer.allocate(len);

@@ -1,10 +1,14 @@
 package com.codepark.openshredder.ui;
 
-import java.io.File;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
+
+import com.codepark.openshredder.types.FileType;
+import com.codepark.openshredder.types.FileTypeFactory;
+import com.codepark.openshredder.types.IFile;
+import com.codepark.openshredder.types.WipeMethod;
 
 public class AbstractFileModel extends AbstractTableModel {
 
@@ -37,6 +41,14 @@ public class AbstractFileModel extends AbstractTableModel {
 
 	}
 
+	public IFile getDataRow(int row) {
+		FileModel fm = (FileModel) dataVector.get(row);
+		WipeMethod method = fm.getWipeMethod();
+		FileType type = fm.getType();
+		String path = fm.getFileName();
+		return FileTypeFactory.createIFile(type, path, method);
+	}
+
 	@Override
 	public Class getColumnClass(int column) {
 		if (column == 0)
@@ -62,9 +74,10 @@ public class AbstractFileModel extends AbstractTableModel {
 		// fireTableRowsInserted(dataVector.size() - 1, dataVector.size() - 1);
 	}
 
-	public void addRow(File f) {
+	public void addRow(IFile f) {
 
 		dataVector.add(new FileModel(f));
+		
 		fireTableRowsInserted(dataVector.size() - 1, dataVector.size() - 1);
 		fireTableDataChanged();
 	}

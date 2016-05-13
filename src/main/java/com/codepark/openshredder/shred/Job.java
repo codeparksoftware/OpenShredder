@@ -2,8 +2,10 @@ package com.codepark.openshredder.shred;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
+ 
 
 public abstract class Job implements ShredObservable, Runnable, IJob {
 
@@ -36,7 +38,7 @@ public abstract class Job implements ShredObservable, Runnable, IJob {
 		try {
 			t.join();
 		} catch (InterruptedException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 		}
 	}
 
@@ -108,7 +110,7 @@ public abstract class Job implements ShredObservable, Runnable, IJob {
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				logger.log(Level.SEVERE, e.getMessage(), e);
+				logger.log(Level.Error, e.getMessage());
 			}
 		}
 

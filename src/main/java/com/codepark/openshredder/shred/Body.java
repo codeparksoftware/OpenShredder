@@ -19,17 +19,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 
 public class Body extends Job {
 
 	private static final Logger logger = Logger.getLogger(Body.class.getName());
 	private File f;
-	private short id;
+	private Object id;
 	private short BYTE_BUFFER = 16384;
 
-	public Body(File f, short id) {
+	public Body(File f, Object id) {
 
 		this.f = f;
 		this.id = id;
@@ -39,10 +40,11 @@ public class Body extends Job {
 	public void SetFileLength() {
 		try {
 			RandomAccessFile rand = new RandomAccessFile(f, "rws");
+
 			rand.setLength(0);
 			rand.close();
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 		}
 
 	}
@@ -54,7 +56,9 @@ public class Body extends Job {
 		try {
 			addThreadId(Thread.currentThread().getId());
 			out = new RandomAccessFile(f.getAbsolutePath(), "rws");
+			out.getFD().sync();
 			ch = out.getChannel();
+			ch.force(true);
 			int buffer = BYTE_BUFFER;
 			long call = 0;
 			long fsize = out.length();
@@ -66,6 +70,7 @@ public class Body extends Job {
 			long loop = (fsize - lastPart) / buffer;
 			ch.position(0);
 			ch.force(true);
+
 			percent(call, fsize);
 			for (int i = 0; i < loop && !Thread.currentThread().isInterrupted(); i++) {
 				ch.write(new WipeValues(buffer, id).GenerateValue());
@@ -77,14 +82,15 @@ public class Body extends Job {
 			percent(call, fsize);
 		} catch (IOException e) {
 			Thread.currentThread().interrupt();
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 		} finally {
 			try {
 				removeThreadId(Thread.currentThread().getId());
+
 				ch.close();
 				out.close();
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, e.getMessage(), e);
+				logger.log(Level.Error, e.getMessage());
 			}
 
 		}

@@ -4,6 +4,8 @@ import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.codepark.openshredder.types.StorageType;
+
 public class AbstractDiskModel extends AbstractTableModel {
 	private String[] columnNames;
 	protected Vector<Object> dataVector;
@@ -56,9 +58,9 @@ public class AbstractDiskModel extends AbstractTableModel {
 		// fireTableRowsInserted(dataVector.size() - 1, dataVector.size() - 1);
 	}
 
-	public void addRow(String[] f) {
+	public void addRow(StorageType type) {
 
-		dataVector.add(new DiskModel(f));
+		dataVector.add(new DiskModel(type));
 		fireTableRowsInserted(dataVector.size() - 1, dataVector.size() - 1);
 	}
 

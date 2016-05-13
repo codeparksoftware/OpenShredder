@@ -138,7 +138,7 @@ public class AboutUs extends JFrame {
 	 */
 	public AboutUs(GraphicsConfiguration gc) {
 		super(gc);
-		// TODO Auto-generated constructor stub
+ 
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class AboutUs extends JFrame {
 	 */
 	public AboutUs(String title) throws HeadlessException {
 		super(title);
-		// TODO Auto-generated constructor stub
+	 
 	}
 
 	/**
@@ -156,6 +156,6 @@ public class AboutUs extends JFrame {
 	 */
 	public AboutUs(String title, GraphicsConfiguration gc) {
 		super(title, gc);
-		// TODO Auto-generated constructor stub
+ 
 	}
 }

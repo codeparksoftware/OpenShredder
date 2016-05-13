@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
 
 import com.codepark.openshredder.common.DialogResult;
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 import com.codepark.openshredder.common.MessageBox;
+import com.codepark.openshredder.common.StringUtil;
 import com.codepark.openshredder.jarinfo.JarAttributes;
 import com.codepark.openshredder.jarinfo.JarUtil;
 import com.codepark.openshredder.system.SystemUtil;
@@ -28,13 +29,11 @@ public class CheckVersion extends BaseProgressPanel {
 	public static final String MSG_NEW_VERSION_FOUND = "New version found!\nDo you want to update now?";
 	public static final String CHECK_VERSION = "Checking version";
 	public static final String MSG_VERSION_NOT_FOUND = "New version not found!";
-
 	private static final Logger logger = Logger.getLogger(CheckVersion.class.getName());
 
 	public CheckVersion(String local, String remote) throws FileNotFoundException {
-		if (local == null || local.trim().isEmpty())
-			throw new FileNotFoundException();
-		if (remote == null || remote.trim().isEmpty())
+
+		if (StringUtil.stringIsNullorEmpty(local) || StringUtil.stringIsNullorEmpty(remote))
 			throw new FileNotFoundException();
 		setLocalFile(local);
 		setRemoteFile(remote);
@@ -54,11 +53,11 @@ public class CheckVersion extends BaseProgressPanel {
 	@Override
 	public void work() {
 		setLabel(CHECK_VERSION);
-		logger.info(CHECK_VERSION);
+		logger.log(Level.Info, CHECK_VERSION);
 		newVersionFound = isNewVersionFound();
 		if (newVersionFound == true) {
 
-			DialogResult sonuc = MessageBox.showMessage(MSG_NEW_VERSION_FOUND, CHECK_VERSION);// Check-if-yes
+			DialogResult sonuc = MessageBox.showMessage(CHECK_VERSION, MSG_NEW_VERSION_FOUND);// Check-if-yes
 			if (sonuc == DialogResult.Yes) {
 				runUpdate();
 
@@ -78,7 +77,7 @@ public class CheckVersion extends BaseProgressPanel {
 		String newFile = "https://raw.githubusercontent.com/codeparksoftware/OpenShredder/master/Shredder.jar";
 		String appName = new JarAttributes(JarUtil.makeJarURLforLocal(JarUtil.getExecutablePath())).getAppName();
 		String updaterPath = JarUtil.getStartupPath() + "\\Updater.jar";
-		logger.info(updaterPath);
+		logger.log(Level.Info, updaterPath);
 		String[] params = new String[3];
 		params[0] = oldFile;
 		params[1] = newFile;
@@ -116,7 +115,7 @@ public class CheckVersion extends BaseProgressPanel {
 			conn.connect();
 			return true;
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 
 			return false;
 		}
@@ -126,7 +125,7 @@ public class CheckVersion extends BaseProgressPanel {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			logger.info(CHECK_CONNECTION);
+			logger.log(Level.Info, CHECK_CONNECTION);
 			setLabel(CHECK_CONNECTION);
 			return isConnected();
 
@@ -142,7 +141,7 @@ public class CheckVersion extends BaseProgressPanel {
 					CheckVersion.this.setVisible(false);
 					finished();
 					MessageBox.showMessage(FAIL_CONNECTION_MSG, CHECK_CONNECTION, 3000);
-					logger.info(FAIL_CONNECTION_MSG);
+					logger.log(Level.Info, FAIL_CONNECTION_MSG);
 
 				} else {
 					start();
@@ -150,7 +149,7 @@ public class CheckVersion extends BaseProgressPanel {
 
 			} catch (ExecutionException | InterruptedException e) {
 
-				logger.log(Level.SEVERE, e.getMessage(), e);
+				logger.log(Level.Error, e.getMessage());
 			}
 
 		}
@@ -168,11 +167,11 @@ public class CheckVersion extends BaseProgressPanel {
 			jar = new JarAttributes(url);
 			String newJarVersion = jar.getVersion();
 			System.out.println(newJarVersion + "<-->" + oldJarVersion);
-			logger.info(newJarVersion + "<-->" + oldJarVersion);
+			logger.log(Level.Info, newJarVersion + "<-->" + oldJarVersion);
 			return newJarVersion.compareTo(oldJarVersion) > 0;
 		} catch (Exception e) {
 
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 			return false;
 		}
 	}

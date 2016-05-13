@@ -6,9 +6,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import com.codepark.openshredder.common.Level;
+import com.codepark.openshredder.common.Logger;
 import com.codepark.openshredder.common.MessageBox;
 import com.codepark.openshredder.ui.MainForm;
 
@@ -23,7 +23,7 @@ public class JarUtil {
 			jarFile = new File(codeSource.getLocation().toURI().getPath());
 		} catch (URISyntaxException e) {
 
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 			return "";
 		}
 		return jarFile.getAbsolutePath();
@@ -39,7 +39,7 @@ public class JarUtil {
 		try {
 			return new URL(str);
 		} catch (MalformedURLException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 		}
 		return null;
 	}
@@ -49,7 +49,7 @@ public class JarUtil {
 		try {
 			return new URL(str);
 		} catch (MalformedURLException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Info, e.getMessage());
 		}
 		return null;
 	}
@@ -60,7 +60,7 @@ public class JarUtil {
 			return true;
 		} catch (IOException e) {
 
-			logger.log(Level.SEVERE, e.getMessage(), e);
+			logger.log(Level.Error, e.getMessage());
 			return false;
 		}
 	}

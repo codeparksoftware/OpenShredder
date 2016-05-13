@@ -1,7 +1,6 @@
 package com.codepark.openshredder.updater;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,15 +11,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.codepark.openshredder.shred.Job;
-import com.codepark.openshredder.system.SystemUtil;
 
 public class FileDownload extends Job {
 
 	private static final Logger logger = Logger.getLogger(FileDownload.class.getName());
 	private String urlPath = null;
 	private String savePath = null;
-	private short BYTE_BUFFER = 4096;
+	private final short BYTE_BUFFER = 4096;
 
+	/**
+	 * Constructs and initailizes FileDownload class
+	 * @param urlPath
+	 *            file url to download from server
+	 * @param savePath
+	 *            file path to save to local system
+	 */
 	public FileDownload(String urlPath, String savePath) {
 		this.urlPath = urlPath;
 		this.savePath = savePath;
@@ -28,6 +33,15 @@ public class FileDownload extends Job {
 
 	@Override
 	public void doJob() {
+		downloadFile();
+
+	}
+
+	/**
+	 * Download file  by given parameters in constructor method.
+	 * Notifies thread id for adding and removing.
+	 */
+	private void downloadFile() {
 		OutputStream out = null;
 		HttpURLConnection conn = null;
 		InputStream in = null;
@@ -64,7 +78,6 @@ public class FileDownload extends Job {
 
 			}
 		}
-		return;
 
 	}
 

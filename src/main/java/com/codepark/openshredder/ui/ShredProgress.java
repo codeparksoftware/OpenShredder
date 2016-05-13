@@ -3,16 +3,14 @@ package com.codepark.openshredder.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JProgressBar;
-import com.codepark.openshredder.shred.IShred;
-import com.codepark.openshredder.shred.ShredFactory;
-import com.codepark.openshredder.shred.WipeMethod;
+
+import com.codepark.openshredder.types.IFile;
 
 /**
  * @author Selami
@@ -20,21 +18,18 @@ import com.codepark.openshredder.shred.WipeMethod;
  */
 public class ShredProgress extends BaseProgressPanel {
 
-	private List<String> list;
-	private final WipeMethod method;
+	private List<IFile> list;
 	private JProgressBar pBarTotal;
 	private JButton btnStart;
-	private boolean wipeFreeSpace = false;
-	private int tmp = 0;
+	int tmp = 0;
 
 	private static final Logger logger = Logger.getLogger(ShredProgress.class.getName());
 
-	public ShredProgress(List<String> lst, WipeMethod wip, boolean wipeFreeSpace) {
+	public ShredProgress(List<IFile> lst) {
 
 		setUIExtension();
 		this.list = Collections.synchronizedList(lst);
-		this.method = wip;
-		this.wipeFreeSpace = wipeFreeSpace;
+
 	}
 
 	protected void setUIExtension() {
@@ -75,26 +70,28 @@ public class ShredProgress extends BaseProgressPanel {
 	public void work() {
 		System.out.println("Starting!...");
 		logger.info("Shredding operation started");
-		for (int i = tmp; i < list.size(); i++) {
-			this.tmp = i;// For Resume operation
-			File f = new File(list.get(i));// why dont we use List<File>
-			this.lblFile.setText(f.getName());
-			IShred shrd = new ShredFactory().ShredType(wipeFreeSpace, this.method, list.get(i).toString());
-			shrd.Shred(this);
-			int current = ((i + 1) * 100) / list.size();
+		long totalSpace = 0, finished = 0;
+		for (int i = 0; i < list.size(); i++) {
+			totalSpace += (list.get(i).getLength() * list.get(i).getWipeMethod().getMethod().length);
+		}
+
+		logger.info("totalSpace:" + String.valueOf(totalSpace));
+		for (int i = 0; i < list.size(); i++) {
+
+			IFile file = list.get(i);
+			file.setObserver(this);
+			this.lblFile.setText(file.getName());
+			finished += (list.get(i).getLength() * list.get(i).getWipeMethod().getMethod().length);
+			setProgress(pBarTotal, (int) (finished * 100 / totalSpace));
+
+			file.shred();
+
 			if (worker.isCancelled()) {
 				return;
 			}
-			ShredProgress.this.setProgress(pBarTotal, current);// calculate all
-																// bytes
-																// refactor
 
 		}
 		finished();
-	}
-
-	public WipeMethod getMethod() {
-		return method;
 	}
 
 }
